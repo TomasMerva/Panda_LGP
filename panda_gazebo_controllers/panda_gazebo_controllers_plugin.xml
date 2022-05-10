@@ -1,0 +1,7 @@
+<library path="lib/libpanda_gazebo_controllers">
+  <class name="panda_gazebo_controllers/JointPositionController" type="panda_gazebo_controllers::JointPositionController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A controller that executes a short motion based on cartesian velocities to demonstrate correct usage
+    </description>
+  </class>
+</library>
