@@ -40,38 +40,60 @@ bool JointPositionController::init(hardware_interface::RobotHW* robot_hardware,
     }
   }
 
-  _joint_position_goal_sub = node_handle.subscribe("/joint_position_goal", 1, &JointPositionController::JointPositionGoalCallback, this);
+  _joint_position_goal_sub = node_handle.subscribe("/panda/joint_position_goal", 1, &JointPositionController::JointPositionGoalCallback, this);
 
   return true;
 }
 
 void JointPositionController::starting(const ros::Time& /* time */) {
   for (size_t i = 0; i < 7; ++i) {
-    _joint_position_goal[i] = position_joint_handles_[i].getPosition();
+    _joint_position_initial[i] = position_joint_handles_[i].getPosition();
   }
+
   elapsed_time_ = ros::Duration(0.0);
+
+  _joint_position_cmd = _joint_position_initial;
+  _joint_position_goal = _joint_position_initial;
+  _joint_position_prev = _joint_position_initial;
 }
 
 void JointPositionController::update(const ros::Time& /*time*/,
                                             const ros::Duration& period) {
-  elapsed_time_ += period;
+  double distance_to_goal_point = 0;
 
-  for (size_t i = 0; i < 7; ++i) {
-    position_joint_handles_[i].setCommand(_joint_position_goal[i]);
+  for (int i=0; i<_NUM_JOINTS; i++)
+  {
+    distance_to_goal_point = _joint_position_goal[i] - position_joint_handles_[i].getPosition();
+
+    int direction = std::signbit(distance_to_goal_point)==1 ? -1 : 1;
+
+    if (std::fabs(distance_to_goal_point)>_POSITION_ACCURACY)
+    {
+      _joint_position_cmd[i] += (direction * _JOINT_VELOCITY * period.toSec());
+      position_joint_handles_[i].setCommand(_joint_position_cmd[i]);
+    }
   }
 }
 
 void JointPositionController::JointPositionGoalCallback(const panda_gazebo_controllers::JointPosition::ConstPtr& msg)
 {
-  _joint_position_goal[0] = msg->joint_position[0];
-  // _joint_position_goal[1] = msg->joint_position[1];
-  // _joint_position_goal[2] = msg->joint_position[2];
-  // _joint_position_goal[3] = msg->joint_position[3];
-  // _joint_position_goal[4] = msg->joint_position[4];
-  // _joint_position_goal[5] = msg->joint_position[5];
-  // _joint_position_goal[6] = msg->joint_position[6];
-
-  // std::copy(std::begin(msg->joint_position), std::end(msg->joint_position), std::begin(_joint_position_goal));
+  if (msg->joint_position.size() != _NUM_JOINTS)
+  {
+    ROS_ERROR_STREAM("PositionJointPositionController: Published Commands are not of size 7");
+    _joint_position_goal = _joint_position_prev;
+    _joint_position_cmd = _joint_position_prev;
+  }
+  else
+  {
+    std::copy(std::begin(msg->joint_position), std::end(msg->joint_position), std::begin(_joint_position_goal));
+    // _joint_position_goal[0] = msg->joint_position[0];
+    // _joint_position_goal[1] = msg->joint_position[1];
+    // _joint_position_goal[2] = msg->joint_position[2];
+    // _joint_position_goal[3] = msg->joint_position[3];
+    // _joint_position_goal[4] = msg->joint_position[4];
+    // _joint_position_goal[5] = msg->joint_position[5];
+    // _joint_position_goal[6] = msg->joint_position[6];
+  }
 }
 
 }  // namespace panda_gazebo_controllers

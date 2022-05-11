@@ -31,8 +31,14 @@ class JointPositionController : public controller_interface::MultiInterfaceContr
   std::array<double, 7> initial_pose_{};
 
   ros::Subscriber _joint_position_goal_sub;
+  std::array<double, 7> _joint_position_initial{};
   std::array<double, 7> _joint_position_goal{};
+  std::array<double, 7> _joint_position_cmd{};
   std::array<double, 7> _joint_position_prev{};
+
+  const int _NUM_JOINTS = 7;
+  const double _POSITION_ACCURACY = 0.001;
+  const double _JOINT_VELOCITY = 0.5;
 };
 
 }  // namespace panda_gazebo_controllers
