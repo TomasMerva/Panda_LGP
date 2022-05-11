@@ -85,14 +85,14 @@ void JointPositionController::JointPositionGoalCallback(const panda_gazebo_contr
   }
   else
   {
-    std::copy(std::begin(msg->joint_position), std::end(msg->joint_position), std::begin(_joint_position_goal));
-    // _joint_position_goal[0] = msg->joint_position[0];
-    // _joint_position_goal[1] = msg->joint_position[1];
-    // _joint_position_goal[2] = msg->joint_position[2];
-    // _joint_position_goal[3] = msg->joint_position[3];
-    // _joint_position_goal[4] = msg->joint_position[4];
-    // _joint_position_goal[5] = msg->joint_position[5];
-    // _joint_position_goal[6] = msg->joint_position[6];
+    // std::copy(std::begin(msg->joint_position), std::end(msg->joint_position), std::begin(_joint_position_goal));
+    _joint_position_goal[0] = msg->joint_position[0];
+    _joint_position_goal[1] = msg->joint_position[1];
+    _joint_position_goal[2] = msg->joint_position[2];
+    _joint_position_goal[3] = msg->joint_position[3];
+    _joint_position_goal[4] = msg->joint_position[4];
+    _joint_position_goal[5] = msg->joint_position[5];
+    _joint_position_goal[6] = msg->joint_position[6];
   }
 }
 

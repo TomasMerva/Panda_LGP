@@ -38,7 +38,7 @@ class JointPositionController : public controller_interface::MultiInterfaceContr
 
   const int _NUM_JOINTS = 7;
   const double _POSITION_ACCURACY = 0.001;
-  const double _JOINT_VELOCITY = 0.5;
+  const double _JOINT_VELOCITY = 0.1;
 };
 
 }  // namespace panda_gazebo_controllers

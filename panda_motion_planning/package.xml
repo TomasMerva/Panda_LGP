@@ -13,6 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>roscpp</depend>
+  <depend>panda_gazebo_controllers</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
