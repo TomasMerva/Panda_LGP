@@ -5,19 +5,22 @@ project(panda_motion_planning)
 add_compile_options(-std=c++11)
 
 find_package(Eigen3 REQUIRED)
+# find_package(ifopt)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   panda_gazebo_controllers
+  ifopt
 )
+find_package(drake CONFIG REQUIRED PATHS /opt/drake)
 
 
 catkin_package(
   INCLUDE_DIRS include/panda_motion_planning
-  LIBRARIES panda_ik_analytic panda_kinematics
+  LIBRARIES panda_ik_analytic panda_kinematics simple_optim_mp
   CATKIN_DEPENDS 
     roscpp
     panda_gazebo_controllers
-#  DEPENDS system_lib
+  DEPENDS drake
 )
 
 include_directories(
@@ -35,3 +38,8 @@ target_link_libraries(panda_motion_planning
                       ${catkin_LIBRARIES}
                       ${EIGEN3_LIBRARIES}
                       )
+
+# Formulate (ifopt:ifopt_core) and solve (ifopt::ifopt_ipopt) the problem
+add_executable(ifopt_test src/ifopt_test.cpp)
+# Pull in include directories, libraries, ... 
+target_link_libraries(ifopt_test ${catkin_LIBRARIES} drake::drake)       
