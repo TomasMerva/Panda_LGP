@@ -3,13 +3,12 @@
 #include <ifopt/problem.h>
 #include <ifopt/ipopt_solver.h>
 #include <panda_motion_planning/simple_optim_mp.h>
-#include <drake/solvers/mathematical_program.h>
-#include<cmath>
+
+#include <cmath>
 #include <typeinfo>
 
 using namespace ifopt;
 
-using drake::solvers::MathematicalProgram;
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "ifopt_mp");
@@ -18,26 +17,16 @@ int main(int argc, char **argv)
     int num_states = 3;
     int num_collocation_points = 10;
 
-    MathematicalProgram program;
-    // auto x = program.NewContinuousVariables(num_collocation_points, num_states, "joints");
-    
-    auto x = program.NewContinuousVariables(2);
-    program.AddConstraint(x[0] + x[1] == 1);
-    program.AddConstraint(x[0] <= x[1]);
-    program.AddCost(x[0] ^2 + x[1] ^ 2);
-
-    // auto result = solvers::Solve(program);
-
-    // // 1. define the problem
-    // Problem nlp;
-    // nlp.AddVariableSet  (std::make_shared<ExVariables>());
+    // 1. define the problem
+    Problem nlp;
+    nlp.AddVariableSet  (std::make_shared<ExVariables>());
     // nlp.AddConstraintSet(std::make_shared<ExConstraint>());
     // nlp.AddCostSet      (std::make_shared<ExCost>());
-    // nlp.PrintCurrent();
+    nlp.PrintCurrent();
 
     // // 2. choose solver and options
     // IpoptSolver ipopt;
-    // ipopt.SetOption("linear_solver", "mumps");
+    // // ipopt.SetOption("linear_solver", "mumps");
     // ipopt.SetOption("jacobian_approximation", "exact");
 
     // // 3 . solve
