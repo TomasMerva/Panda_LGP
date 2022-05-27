@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   ifopt
 )
 find_package(drake CONFIG REQUIRED PATHS /opt/drake)
+find_package(casadi)
 
 #simple_optim_mp
 catkin_package(
@@ -40,10 +41,15 @@ target_link_libraries(panda_motion_planning
                       )
 
 # Formulate (ifopt:ifopt_core) and solve (ifopt::ifopt_ipopt) the problem
-# add_executable(ifopt_test src/ifopt_test.cpp)
-# # Pull in include directories, libraries, ... 
-# target_link_libraries(ifopt_test ${catkin_LIBRARIES} drake::drake)       
+add_executable(ifopt_test src/ifopt_test.cpp)
+# Pull in include directories, libraries, ... 
+target_link_libraries(ifopt_test ${catkin_LIBRARIES} drake::drake)       
 
 add_executable(drake_test src/drake_test.cpp)
 # Pull in include directories, libraries, ... 
 target_link_libraries(drake_test ${catkin_LIBRARIES} drake::drake)       
+
+
+add_executable(casadi_test src/casadi_test.cpp)
+# Pull in include directories, libraries, ... 
+target_link_libraries(casadi_test ${catkin_LIBRARIES} casadi)       
