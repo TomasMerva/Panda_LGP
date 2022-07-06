@@ -9,7 +9,7 @@ namespace motion_planning {
 // }
 
 DecisionVariables::DecisionVariables(const std::string& name, const int num_variables, const int num_time_slices,
-                                    const std::vector<float> q_start, const std::vector<float> q_goal)
+                                    const std::vector<double> q_start, const std::vector<double> q_goal)
     : ifopt::VariableSet(num_variables*num_time_slices, name)
       ,_q(num_variables, num_time_slices)
     //   ,_upper_bounds_mat(num_variables, num_time_slices)
@@ -27,7 +27,9 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
         // auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
         std::vector<double> temp_init(num_time_slices, _q_start[i]);
         _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
+        std::cout << _q.row(i) << std::endl;
     }
+    _q.col(-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
 }
 
 

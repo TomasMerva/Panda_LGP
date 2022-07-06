@@ -16,7 +16,7 @@ public:
     // and costs to define values and Jacobians specifically w.r.t this variable set.
     // DecisionVariables();
     DecisionVariables(const std::string& name, const int num_variables, const int num_time_slices,
-                      const std::vector<float> q_start, const std::vector<float> q_goal);
+                      const std::vector<double> q_start, const std::vector<double> q_goal);
 
     // Here is where you can transform the Eigen::Vector into whatever
     // internal representation of your variables you have (here two doubles, but
@@ -41,8 +41,8 @@ public:
 
 private:
     Eigen::MatrixXd _q;
-    std::vector<float> _q_start = std::vector<float>(7);
-    std::vector<float> _q_goal = std::vector<float>(7);
+    std::vector<double> _q_start = std::vector<double>(7);
+    std::vector<double> _q_goal = std::vector<double>(7);
 
     Eigen::MatrixXd _upper_bounds_mat;
     Eigen::MatrixXd _lower_bounds_mat;

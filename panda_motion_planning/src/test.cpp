@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     std::array<double, 16> O_T_EE_array = {1, 0, 0, 0,
                                            0, -1, 0, 0,
                                            0, 0, -1, 0,
-                                           0.4, 0, 0.2, 1};
+                                           0.5, 0, 0.05, 1};
 
 
     using std::chrono::high_resolution_clock;
@@ -31,8 +31,8 @@ int main(int argc, char **argv)
     using std::chrono::milliseconds;
     auto t1 = high_resolution_clock::now();
 
-    // auto result = panda.InverseKinematics(O_T_EE_array, panda._joint_position[6], panda._joint_position);
-    auto result = franka_IK_EE_CC(O_T_EE_array, panda._joint_position[6], panda._joint_position);
+    auto result = panda.InverseKinematics(O_T_EE_array, panda._joint_position[6], panda._joint_position);
+    // auto result = franka_IK_EE_CC(O_T_EE_array, panda._joint_position[6], panda._joint_position);
 
 
     auto t2 = high_resolution_clock::now();

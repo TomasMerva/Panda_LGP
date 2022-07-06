@@ -18,10 +18,10 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "manipulator");
   ros::NodeHandle nh;
 
-  std::vector<float> q_start{0, -0.7856, -1.4014, -2.3559, -1.1646, 1.5717, 0.7853};
-  std::vector<float> q_goal{-0.2919, 0.1937, -0.1681, -2.086, 0.0369, 2.3322, 0.3197};
+  std::vector<double> q_start{0.0, -0.7856, -1.4014, -2.3559, -1.1646, 1.5717, 0.7853};
+  std::vector<double> q_goal{-0.2919, 0.1937, -0.1681, -2.086, 0.0369, 2.3322, 0.3197};
   const int num_joints = 7;
-  const int num_time_slices = 20;
+  const int num_time_slices = 5;
 
 
   // DecisionVariables komo("x", num_joints, num_time_slices, q_start, q_goal);
@@ -33,10 +33,10 @@ int main(int argc, char **argv)
 
 
   // 2. choose solver and options
-  ifopt::IpoptSolver ipopt;
-  ipopt.SetOption("linear_solver", "mumps");
-  ipopt.SetOption("jacobian_approximation", "true");
-  ipopt.SetOption("acceptable_tol", 1e-3);
+  // ifopt::IpoptSolver ipopt;
+  // ipopt.SetOption("linear_solver", "mumps");
+  // ipopt.SetOption("jacobian_approximation", "true");
+  // ipopt.SetOption("acceptable_tol", 1e-3);
 
   // // ipopt.SetOption("jacobian_approximation", "finite-difference-values");
 
