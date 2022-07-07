@@ -55,6 +55,7 @@ double Objective::GetCost() const
         // std::cout << "x_t(i): " << x_t.col(i) << "\t -2*x_t_minus1: " << -2*x_t_minus1.col(i) << "\t x_t_minus2: " << x_t_minus2.col(i) << "\n";
         Eigen::VectorXd f = (x_t.col(i) - (2*x_t_minus1.col(i)) + x_t_minus2.col(i));
         // Eigen::VectorXd f = x_t.col(i) - x_t_minus1.col(i);
+        // std::cout << "f : "<< f << std::endl;
 
         cost += (f.transpose() * f);
         // std::cout << "i:" << i << "\t cost: " << cost << "\t f: " << f << "\t transpose: " << f.transpose() << "\n\n";
@@ -65,12 +66,119 @@ double Objective::GetCost() const
 
 void Objective::FillJacobianBlock (std::string var_set, Jacobian& jac) const
 {
-    // if (var_set == "x") {
-    //     Vector2d x = GetVariables()->GetComponent("x")->GetValues();
+    if (var_set == "x") {
+        VectorXd x = GetVariables()->GetComponent("x")->GetValues();
 
-    //     jac.coeffRef(0, 0) = 0.0;             // derivative of cost w.r.t x0
-    //     jac.coeffRef(0, 1) = -2.0*(x(1)-2.0); // derivative of cost w.r.t x1
-    // }
+        // jac.coeffRef(0, 0) = 4*x(0) - 6*x(1) + 2*x(2);
+        // jac.coeffRef(0, 1) = 12*x(1) - 6*x(0) - 8*x(2) + 2*x(3);
+        // jac.coeffRef(0, 2) = 2*x(0) - 8*x(1) + 12*x(2) - 8*x(3) + 2*x(4);
+        // jac.coeffRef(0, 3) = 2*x(1) -8*x(2) + 10*x(3) - 4*x(4);
+        // jac.coeffRef(0, 4) = 2*x(2) - 4*x(3) + 2*x(4);
+
+        // jac.coeffRef(0, 0) = 4*x(0) - 6*x(7) + 2*x(14);
+        // jac.coeffRef(0, 1) = 4*x(1) - 6*x(8) + 2*x(15);
+
+        int idx = 0; // (0col)
+        for (idx; idx<_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 4*x(idx) - 6*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; // idx=7 (1col)
+        for (idx; idx<2*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 12*x(idx) - 6*x(idx-_num_variables) - 8*x(idx + _num_variables) + 2*x(idx + 2*_num_variables);
+        }
+        idx++; //idx=14 (2col)
+        for (idx; idx<3*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=21 (3col)
+        for (idx; idx<4*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=28 (4col)
+        for (idx; idx<5*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=35 (5col)
+        for (idx; idx<6*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=42 (6col)
+        for (idx; idx<7*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=49 (7col)
+        for (idx; idx<8*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=56 (8col)
+        for (idx; idx<9*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=63 (9col)
+        for (idx; idx<10*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=70 (10col)
+        for (idx; idx<11*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=77 (11col)
+        for (idx; idx<12*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=84 (12col)
+        for (idx; idx<13*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=91 (13col)
+        for (idx; idx<14*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=98 (14col)
+        for (idx; idx<15*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=105 (15col)
+        for (idx; idx<16*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=112 (16col)
+        for (idx; idx<17*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=119 (17col)
+        for (idx; idx<18*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 8*x(idx - _num_variables) + 12*x(idx) - 8*x(idx+_num_variables) + 2*x(idx+2*_num_variables);
+        }
+        idx++; //idx=126 (18col)
+        for (idx; idx<19*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx-2*_num_variables) -8*x(idx-_num_variables) + 10*x(idx) - 4*x(idx+_num_variables);
+        }
+        idx++; //idx=133 (19col)
+        for (idx; idx<19*_num_variables; idx++)
+        {
+            jac.coeffRef(0, idx) = 2*x(idx - 2*_num_variables) - 4*x(idx - _num_variables) + 2*x(idx);
+        }
+    }
 }
 
 } //namespace ifopt

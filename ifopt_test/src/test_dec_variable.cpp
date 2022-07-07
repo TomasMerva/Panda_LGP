@@ -12,6 +12,8 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
                                     const std::vector<double> q_start, const std::vector<double> q_goal)
     : ifopt::VariableSet(num_variables*num_time_slices, name)
       ,_q(num_variables, num_time_slices)
+      ,_q_start(num_variables)
+      ,_q_goal(num_variables)
     //   ,_upper_bounds_mat(num_variables, num_time_slices)
     //   ,_lower_bounds_mat(num_variables, num_time_slices)
 
@@ -24,12 +26,11 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
     // Initial guess
     for (int i=0; i<num_variables; i++)
     {
-        // auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
-        std::vector<double> temp_init(num_time_slices, _q_start[i]);
+        auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
+        // std::vector<double> temp_init(num_time_slices, _q_start[i]);
         _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
-        std::cout << _q.row(i) << std::endl;
     }
-    _q.col(-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
+    // _q.col(num_time_slices-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
 }
 
 
@@ -68,6 +69,9 @@ DecisionVariables::VecBound DecisionVariables::GetBounds() const
     VecBound bounds(GetRows());
     for (int i=0; i<_num_time_slices; i++)
     {
+        // bounds.at(i) = ifopt::Bounds(-2.8973, 2.8973);  // joint_1
+        // bounds.at(i*3+1) = ifopt::Bounds(-1.7628, 1.7628);  // joint_2
+        // bounds.at(i*3+2) = ifopt::Bounds(-2.8973, 2.8973);  // joint_3
         bounds.at(i*7+0) = ifopt::Bounds(-2.8973, 2.8973);  // joint_1
         bounds.at(i*7+1) = ifopt::Bounds(-1.7628, 1.7628);  // joint_2
         bounds.at(i*7+2) = ifopt::Bounds(-2.8973, 2.8973);  // joint_3

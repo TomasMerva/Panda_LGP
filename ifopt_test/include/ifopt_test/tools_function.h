@@ -50,3 +50,34 @@ void PlotData(const std::vector<T> x_data, const std::vector<T> y_data, const st
     gp << "plot" << gp.file1d(plot_vector) << "with linespoints linestyle 1 title '" << label << "'\n";
 
 }
+
+template<typename T>
+void MultiPlotData(const std::vector<T> x_data, const std::vector<std::vector<T>> y_data, const std::string label)
+{
+    std::vector<std::vector<std::pair<T, T>>> plot_vector(x_data.size());
+    // for (size_t i=0; i<plot_vector.size(); i++)
+    // {
+    //   plot_vector[i] = std::make_pair(x_data[i], y_data[i]);
+    // }
+
+    // Gnuplot gp;
+    // gp << "set multiplot layout 2,2 \n";
+    // gp << "set style line 1 \
+    //   linecolor rgb '#0060ad' \
+    //   linetype 1 linewidth 2 \
+    //   pointtype 7 pointsize 1.5\n";
+    // // gp << "plot" << gp.file1d(plot_vector) << "with linespoints linestyle 1 title '" << label << "'\n";
+
+    // for (size_t i=0; i<y_data.size(); i++)
+    // {
+    //   for (size_t j=0; j<y_data[i].size(); j++)
+    //   {
+    //     plot_vector[i][j] = std::make_pair(x_data[j], y_data[i][j]);        
+    //   }
+    // }
+    // gp << "plot" << gp.file1d(plot_vector[0]) << "with linespoints linestyle 1 title 'joint_1'" <<
+    // gp.file1d(plot_vector[1]) << "with linespoints linestyle 1 title 'joint_1'" <<
+    //  "'\n";
+
+
+}

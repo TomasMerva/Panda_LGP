@@ -41,8 +41,8 @@ public:
 
 private:
     Eigen::MatrixXd _q;
-    std::vector<double> _q_start = std::vector<double>(7);
-    std::vector<double> _q_goal = std::vector<double>(7);
+    std::vector<double> _q_start;
+    std::vector<double> _q_goal;
 
     Eigen::MatrixXd _upper_bounds_mat;
     Eigen::MatrixXd _lower_bounds_mat;
