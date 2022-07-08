@@ -33,59 +33,59 @@ int main(int argc, char **argv)
   nlp.AddVariableSet(std::make_shared<DecisionVariables>("x", num_joints, num_time_slices, q_start, q_goal));
   nlp.AddCostSet(std::make_shared<Objective>("k_order=2", num_joints, num_time_slices));
   nlp.PrintCurrent();
-
+  nlp.GetCosts();
 
   // 2. choose solver and options
   ifopt::IpoptSolver ipopt;
   ipopt.SetOption("linear_solver", "mumps");
   ipopt.SetOption("jacobian_approximation", "exact");
-  ipopt.SetOption("acceptable_tol", 1e-2);
-
+  // ipopt.SetOption("acceptable_tol", 1e-2);
   // ipopt.SetOption("jacobian_approximation", "finite-difference-values");
-
+  ipopt.SetOption("derivative_test", "first-order");
+  // ipopt.SetOption("max_iter", 2);
 
   // 3 . solve
   ipopt.Solve(nlp);
-  Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
+  // Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
 
-  // Eigen::MatrixXd result(num_joints, num_time_slices);
+  // // Eigen::MatrixXd result(num_joints, num_time_slices);
 
-  std::vector<std::vector<double>> result;
-  int idx = 0;
-  for (int j=0; j<num_time_slices; j++)
-  {
-    std::vector<double> temp;
-    for (int i=0; i<num_joints; i++)
-    {
-      temp.push_back(x(idx));
-      idx++;
-    }
-    result.push_back(temp);
-  }
+  // std::vector<std::vector<double>> result;
+  // int idx = 0;
+  // for (int j=0; j<num_time_slices; j++)
+  // {
+  //   std::vector<double> temp;
+  //   for (int i=0; i<num_joints; i++)
+  //   {
+  //     temp.push_back(x(idx));
+  //     idx++;
+  //   }
+  //   result.push_back(temp);
+  // }
   // std::cout << "Results:\n" << result << std::endl;
 
 
 
-  // Visualize results
-  std::vector<double> time = linspace(0, 5, num_time_slices);
-  std::vector<double> q1, q2, q3, q4, q5, q6, q7;
-  for (int i=0; i<num_time_slices; i++)
-  {
-    q1.push_back(result[i][0]);
-    q2.push_back(result[i][1]);
-    q3.push_back(result[i][2]);
-    q4.push_back(result[i][3]);
-    q5.push_back(result[i][4]);
-    q6.push_back(result[i][5]);
-    q7.push_back(result[i][6]);
-  }
+  // // Visualize results
+  // std::vector<double> time = linspace(0, 5, num_time_slices);
+  // std::vector<double> q1, q2, q3, q4, q5, q6, q7;
+  // for (int i=0; i<num_time_slices; i++)
+  // {
+  //   q1.push_back(result[i][0]);
+  //   q2.push_back(result[i][1]);
+  //   q3.push_back(result[i][2]);
+  //   q4.push_back(result[i][3]);
+  //   q5.push_back(result[i][4]);
+  //   q6.push_back(result[i][5]);
+  //   q7.push_back(result[i][6]);
+  // }
 
   
-  std::vector<std::vector<double>> data{q1, q2, q3, q4, q5, q6, q7};
-  // MultiPlotData(time, data, "Joint_1");
-  PlotData(time, q1, "joint1");
-  PlotData(time, q2, "joint2");
-  PlotData(time, q3, "joint3");
+  // std::vector<std::vector<double>> data{q1, q2, q3, q4, q5, q6, q7};
+  // // MultiPlotData(time, data, "Joint_1");
+  // PlotData(time, q1, "joint1");
+  // PlotData(time, q2, "joint2");
+  // PlotData(time, q3, "joint3");
   // PlotData(time, q4, "joint4");
   // PlotData(time, q5, "joint5");
   // PlotData(time, q6, "joint6");
