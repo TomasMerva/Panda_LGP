@@ -4,6 +4,7 @@
 #include <drake/solvers/mathematical_program.h>
 // #include <drake/solvers/solve.h>
 #include <drake/solvers/ipopt_solver.h>
+#include <drake/solvers/solver_options.h>
 
 #include <cmath>
 #include <typeinfo>
@@ -34,9 +35,14 @@ int main(int argc, char **argv)
     program.AddConstraint(x[0] <= x[1]);
     program.AddCost(pow(x[0],2) + pow(x[1],2));
 
+
+    drake::solvers::SolverOptions options;
+    options.SetOption(drake::solvers::IpoptSolver::id(), "linear_solver", "mumps");
     IpoptSolver solver;
     RowVector initial_guess(2);
     initial_guess << 1, 1;
+
+
         
     auto t1 = high_resolution_clock::now();
     auto result = solver.Solve(program, initial_guess);

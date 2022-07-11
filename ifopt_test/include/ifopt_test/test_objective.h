@@ -10,7 +10,7 @@ using Vector2d = Eigen::Vector2d;
 class Objective : public ifopt::CostTerm
 {
 public:
-    Objective();
+    // Objective();
     Objective(const std::string& name, const int num_variables, const int num_time_slices);
 
     double GetCost() const override;

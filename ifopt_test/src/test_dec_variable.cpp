@@ -23,13 +23,14 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
     _num_variables = num_variables;
     _num_time_slices = num_time_slices;
 
-    // Initial guess
-    for (int i=0; i<num_variables; i++)
-    {
-        // auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
-        std::vector<double> temp_init(num_time_slices, _q_start[i]);
-        // _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
-    }
+    // // Initial guess
+    // for (int i=0; i<num_variables; i++)
+    // {
+    //     // auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
+    //     std::vector<double> temp_init(num_time_slices, _q_start[i]);
+    //     _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
+    // }
+    _q.col(0) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_start.data(), _q_start.size());
     _q.col(num_time_slices-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
 }
 
@@ -37,11 +38,11 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
 void DecisionVariables::SetVariables(const VectorXd& x)
 {
     int idx = 0;
-    for (int j=0; j<_q.cols(); j++)
+    for (int col=0; col<_q.cols(); col++)
     {
-        for (int i=0; i<_q.rows(); i++)
+        for (int row=0; row<_q.rows(); row++)
         {
-            _q(i,j) = x(idx);
+            _q(row, col) = x(idx);
             idx++;
         }
     }
@@ -52,11 +53,11 @@ DecisionVariables::VectorXd DecisionVariables::GetValues() const
 {
     VectorXd x(GetRows());
     int idx = 0;
-    for (int j=0; j<_q.cols(); j++)
+    for (int col=0; col<_q.cols(); col++)
     {
-        for (int i=0; i<_q.rows(); i++)
+        for (int row=0; row<_q.rows(); row++)
         {
-            x(idx) = _q(i,j);
+            x(idx) = _q(row, col);
             idx++;
         }
     }
@@ -69,9 +70,6 @@ DecisionVariables::VecBound DecisionVariables::GetBounds() const
     VecBound bounds(GetRows());
     for (int i=0; i<_num_time_slices; i++)
     {
-        // bounds.at(i) = ifopt::Bounds(-2.8973, 2.8973);  // joint_1
-        // bounds.at(i*3+1) = ifopt::Bounds(-1.7628, 1.7628);  // joint_2
-        // bounds.at(i*3+2) = ifopt::Bounds(-2.8973, 2.8973);  // joint_3
         bounds.at(i*7+0) = ifopt::Bounds(-2.8973, 2.8973);  // joint_1
         bounds.at(i*7+1) = ifopt::Bounds(-1.7628, 1.7628);  // joint_2
         bounds.at(i*7+2) = ifopt::Bounds(-2.8973, 2.8973);  // joint_3
@@ -81,7 +79,6 @@ DecisionVariables::VecBound DecisionVariables::GetBounds() const
         bounds.at(i*7+6) = ifopt::Bounds(-2.8973, 2.8973);  // joint_7
     }
 
-    // start
     int idx = 0;
     for (int i=0; i<_num_variables; i++)
     {
@@ -92,9 +89,5 @@ DecisionVariables::VecBound DecisionVariables::GetBounds() const
     return bounds;
 }
 
-Eigen::MatrixXd DecisionVariables::GetX0()
-{
-    return _q;
-}
 
-} //ifopt namespace
+} //ifopt motion_planning

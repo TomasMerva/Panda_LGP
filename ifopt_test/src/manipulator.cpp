@@ -33,22 +33,55 @@ int main(int argc, char **argv)
   nlp.AddVariableSet(std::make_shared<DecisionVariables>("x", num_joints, num_time_slices, q_start, q_goal));
   nlp.AddCostSet(std::make_shared<Objective>("k_order=2", num_joints, num_time_slices));
   nlp.PrintCurrent();
-  nlp.GetCosts();
+  // std::cout << nlp.GetVariableValues().transpose() << std::endl;
+  
 
   // 2. choose solver and options
   ifopt::IpoptSolver ipopt;
   ipopt.SetOption("linear_solver", "mumps");
   ipopt.SetOption("jacobian_approximation", "exact");
-  // ipopt.SetOption("acceptable_tol", 1e-2);
+  ipopt.SetOption("acceptable_tol", 1e-2);
   // ipopt.SetOption("jacobian_approximation", "finite-difference-values");
-  ipopt.SetOption("derivative_test", "first-order");
+  // ipopt.SetOption("derivative_test", "first-order");
   // ipopt.SetOption("max_iter", 2);
 
+
+  ros::Duration(1).sleep();
+  std::cout << "----------------" << std::endl;
+  std::cout << "Starting to optimize" << std::endl;
   // 3 . solve
   ipopt.Solve(nlp);
-  // Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
+  Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
 
-  // // Eigen::MatrixXd result(num_joints, num_time_slices);
+  std::cout << x << std::endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Eigen::MatrixXd result(num_joints, num_time_slices);
 
   // std::vector<std::vector<double>> result;
   // int idx = 0;

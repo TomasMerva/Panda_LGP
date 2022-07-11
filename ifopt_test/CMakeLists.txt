@@ -41,3 +41,16 @@ target_link_libraries(manipulator
                     test_objective
                     ${catkin_LIBRARIES}
                     ${Boost_LIBRARIES})
+
+add_executable(main src/main.cpp )
+target_link_libraries(main
+                    test_dec_variable
+                    test_constraints
+                    test_objective
+                    ${catkin_LIBRARIES}
+                    ${Boost_LIBRARIES})
+
+add_executable(ex_test_ipopt src/ex_test_ipopt.cc)
+target_link_libraries(ex_test_ipopt
+                    ${catkin_LIBRARIES}
+                    ${Boost_LIBRARIES})
