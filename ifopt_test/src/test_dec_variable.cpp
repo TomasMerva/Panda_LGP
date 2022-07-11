@@ -23,13 +23,13 @@ DecisionVariables::DecisionVariables(const std::string& name, const int num_vari
     _num_variables = num_variables;
     _num_time_slices = num_time_slices;
 
-    // // Initial guess
-    // for (int i=0; i<num_variables; i++)
-    // {
-    //     // auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
-    //     std::vector<double> temp_init(num_time_slices, _q_start[i]);
-    //     _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
-    // }
+    // Initial guess
+    for (int i=0; i<num_variables; i++)
+    {
+         auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
+        //std::vector<double> temp_init(num_time_slices, _q_start[i]);
+        _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
+    }
     _q.col(0) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_start.data(), _q_start.size());
     _q.col(num_time_slices-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
 }

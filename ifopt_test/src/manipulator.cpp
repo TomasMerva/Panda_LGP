@@ -25,76 +25,46 @@ int main(int argc, char **argv)
   const int num_time_slices = 20;
 
 
-  // DecisionVariables komo("x", num_joints, num_time_slices, q_start, q_goal);
-  // Objective objective("k_order=2", num_joints, num_time_slices);
-  // // std::cout << komo.GetValues() << std::endl;
-  // // objective.Print
+  // 1. define a problem
   ifopt::Problem nlp;
   nlp.AddVariableSet(std::make_shared<DecisionVariables>("x", num_joints, num_time_slices, q_start, q_goal));
   nlp.AddCostSet(std::make_shared<Objective>("k_order=2", num_joints, num_time_slices));
   nlp.PrintCurrent();
-  // std::cout << nlp.GetVariableValues().transpose() << std::endl;
   
-
   // 2. choose solver and options
   ifopt::IpoptSolver ipopt;
-  ipopt.SetOption("linear_solver", "mumps");
+  ipopt.SetOption("linear_solver", "ma57");
   ipopt.SetOption("jacobian_approximation", "exact");
+  ipopt.SetOption("hessian_approximation", "limited-memory");
+  ipopt.SetOption("max_cpu_time", 600);
+  ipopt.SetOption("max_iter", 10000);
+  ipopt.SetOption("tol", 1e-3);
   ipopt.SetOption("acceptable_tol", 1e-2);
-  // ipopt.SetOption("jacobian_approximation", "finite-difference-values");
-  // ipopt.SetOption("derivative_test", "first-order");
-  // ipopt.SetOption("max_iter", 2);
+  ipopt.SetOption("acceptable_iter", 10);
+  ipopt.SetOption("warm_start_init_point", "yes");
+  // ipopt.SetOption("derivative_test", "second-order");
 
-
-  ros::Duration(1).sleep();
-  std::cout << "----------------" << std::endl;
-  std::cout << "Starting to optimize" << std::endl;
-  // 3 . solve
+  // 3. solve
   ipopt.Solve(nlp);
   Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
 
-  std::cout << x << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // std::cout << x << std::endl;
 
 
   // Eigen::MatrixXd result(num_joints, num_time_slices);
 
-  // std::vector<std::vector<double>> result;
-  // int idx = 0;
-  // for (int j=0; j<num_time_slices; j++)
-  // {
-  //   std::vector<double> temp;
-  //   for (int i=0; i<num_joints; i++)
-  //   {
-  //     temp.push_back(x(idx));
-  //     idx++;
-  //   }
-  //   result.push_back(temp);
-  // }
+  std::vector<std::vector<double>> result;
+  int idx = 0;
+  for (int j=0; j<num_time_slices; j++)
+  {
+    std::vector<double> temp;
+    for (int i=0; i<num_joints; i++)
+    {
+      temp.push_back(x(idx));
+      idx++;
+    }
+    result.push_back(temp);
+  }
   // std::cout << "Results:\n" << result << std::endl;
 
 

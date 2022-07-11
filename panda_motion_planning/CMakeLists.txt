@@ -8,7 +8,7 @@ find_package(Eigen3 REQUIRED)
 # find_package(ifopt)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  panda_gazebo_controllers
+  #panda_gazebo_controllers
   ifopt
 )
 find_package(drake CONFIG REQUIRED PATHS /opt/drake)
@@ -20,7 +20,7 @@ catkin_package(
   LIBRARIES panda_ik_analytic panda_kinematics 
   CATKIN_DEPENDS 
     roscpp
-    panda_gazebo_controllers
+ #   panda_gazebo_controllers
   DEPENDS drake
 )
 

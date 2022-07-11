@@ -4,13 +4,13 @@
 #include <chrono>
 
 #include <panda_motion_planning/panda_kinematics.h>
-#include <panda_gazebo_controllers/JointPosition.h>
+//#include <panda_gazebo_controllers/JointPosition.h>
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "panda_motion_planning");
     ros::NodeHandle nh;
-
+/*
     ros::Publisher pub = nh.advertise<panda_gazebo_controllers::JointPosition>("/panda/joint_position_goal", 1);
 
     ros::AsyncSpinner spinner(1);
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
     std::copy(std::begin(result), std::end(result), std::begin(msg.joint_position));
     pub.publish(msg);
-
+*/
     ros::waitForShutdown();
     return 0;
 }
