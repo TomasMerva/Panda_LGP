@@ -13,8 +13,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>roscpp</depend>
-<!--  <depend>panda_gazebo_controllers</depend>-->
+  <depend>panda_gazebo_controllers</depend>
   <depend>ifopt</depend>
+  <depend>gnuplot_module</depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

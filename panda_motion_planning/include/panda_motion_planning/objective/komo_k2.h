@@ -13,8 +13,11 @@ class KOMO_k2
         static void FillJacobianBlock(const std::vector<double> &x, std::vector<double> &jac);
         static void GetStateNodes(const std::vector<double> &vector_set, Eigen::MatrixXd  &internal_rep_set);
 
+        static int num_iterations;
+
     private:
         static const int _num_variables = 7;
         static const int _num_time_slices = 20;
+
 }; 
 

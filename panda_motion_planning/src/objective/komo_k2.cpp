@@ -1,9 +1,10 @@
 #include <panda_motion_planning/objective/komo_k2.h>
 
+int KOMO_k2::num_iterations = 0;
+
 KOMO_k2::KOMO_k2(const int num_variables, const int num_time_slices)
-    // : _num_variables(num_variables)
-    //  ,_num_time_slices(num_time_slices)
 {
+   
 }
 
 KOMO_k2::~KOMO_k2()
@@ -27,6 +28,8 @@ void KOMO_k2::GetStateNodes(const std::vector<double> &vector_set, Eigen::Matrix
 
 double KOMO_k2::GetCost(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
 {
+    num_iterations++;
+
     if (!grad.empty()) {
         FillJacobianBlock(x, grad);
     }

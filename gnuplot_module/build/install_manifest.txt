@@ -1,0 +1,7 @@
+/usr/local/lib/libgnuplot_module.so
+/usr/local/include/gnuplot_module/gnuplot_module.h
+/usr/local/share/gnuplot_module/cmake/gnuplot_module-targets.cmake
+/usr/local/share/gnuplot_module/cmake/gnuplot_module-targets-noconfig.cmake
+/usr/local/share/gnuplot_module/cmake/gnuplot_module-config.cmake
+/usr/local/share/gnuplot_module/cmake/gnuplot_module-config-version.cmake
+/usr/local/share/gnuplot_module/package.xml

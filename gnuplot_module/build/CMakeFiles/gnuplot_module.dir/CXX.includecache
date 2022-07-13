@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/gnuplot_module/gnuplot_module.h
+gnuplot-iostream.h
+../include/gnuplot_module/gnuplot-iostream.h
+vector
+-
+
+/home/tomas/catkin_ws/src/Panda_LGP/gnuplot_module/src/gnuplot_module.cpp
+gnuplot_module/gnuplot_module.h
+-
+

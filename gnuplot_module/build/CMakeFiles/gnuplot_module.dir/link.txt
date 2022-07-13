@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC   -shared -Wl,-soname,libgnuplot_module.so -o libgnuplot_module.so CMakeFiles/gnuplot_module.dir/src/gnuplot_module.cpp.o  -Wl,-rpath,:::::::::::::: 

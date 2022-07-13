@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(panda_motion_planning)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 
 IF(NOT CMAKE_BUILD_TYPE MATCHES Release)
@@ -17,7 +17,7 @@ find_package(Boost REQUIRED COMPONENTS iostreams system filesystem)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   ifopt
-  #panda_gazebo_controllers
+  panda_gazebo_controllers
 )
 
 
@@ -27,7 +27,8 @@ catkin_package(
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS 
     roscpp
- #   panda_gazebo_controllers
+    gnuplot_module
+    panda_gazebo_controllers
   DEPENDS
 )
 
@@ -37,6 +38,8 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}
 )
 include_directories("/usr/local/include")
+include_directories("/usr/local/include/gnuplot_module")
+
 # include_directories("/home/tomas/Repos/gnuplot-iostream/gnuplot-iostream")
 
 
@@ -54,11 +57,12 @@ target_link_libraries(joint_variable ${catkin_LIBRARIES})
 # SET(NLOPT_LIBRARIES "/usr/local/lib/libnlopt.so.0")
 
 add_executable(komo src/komo.cpp)
-target_link_libraries(komo 
+target_link_libraries(komo
                       komo_lib
                       joint_variable
                       komo_k2_cost
                       "/usr/local/lib/libnlopt.so"
+                      gnuplot_module
                       ${catkin_LIBRARIES}
                       ${Boost_LIBRARIES}
                       )

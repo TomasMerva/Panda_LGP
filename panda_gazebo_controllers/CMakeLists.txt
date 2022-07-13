@@ -62,7 +62,7 @@ add_dependencies(panda_gazebo_controllers
   ${catkin_EXPORTED_TARGETS}
   ${PROJECT_NAME}_generate_messages_cpp
   ${PROJECT_NAME}_gencpp
-  ${PROJECT_NAME}_gencfg
+  # ${PROJECT_NAME}_gencfg
 )
 
 target_link_libraries(panda_gazebo_controllers PUBLIC
