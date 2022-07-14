@@ -16,8 +16,8 @@ class KOMO_k2
         static int num_iterations;
 
     private:
-        static const int _num_variables = 7;
-        static const int _num_time_slices = 20;
+        static const int _num_variables;
+        static const int _num_time_slices;
 
 }; 
 

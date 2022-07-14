@@ -1,6 +1,8 @@
 #include <panda_motion_planning/objective/komo_k2.h>
 
 int KOMO_k2::num_iterations = 0;
+const int KOMO_k2::_num_variables = 7;
+const int KOMO_k2::_num_time_slices = 20;
 
 KOMO_k2::KOMO_k2(const int num_variables, const int num_time_slices)
 {

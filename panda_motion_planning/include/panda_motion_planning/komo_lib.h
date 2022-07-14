@@ -1,4 +1,4 @@
-#pragma onc
+#pragma once
 
 #include <math.h>
 #include <vector>
