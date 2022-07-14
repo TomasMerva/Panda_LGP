@@ -5,7 +5,7 @@ namespace panda_kinematics
 
 Kinematics::Kinematics(ros::NodeHandle *nh)
 {
-    _sub_franka_state = nh->subscribe("/franka_state_controller/joint_states", 1, &Kinematics::FrankaStateCallback, this);
+    // _sub_franka_state = nh->subscribe("/franka_state_controller/joint_states", 1, &Kinematics::FrankaStateCallback, this);
 }
 
 

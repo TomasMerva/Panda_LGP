@@ -21,10 +21,13 @@ class KOMO
 {
     public:
         KOMO(const int num_joints, const int num_time_slices, const int k_order);
-        ~KOMO();
+        ~KOMO(){};
         void UpdateStates(const std::vector<double> new_start_state, const std::vector<double> new_goal_state);
         std::vector<std::vector<double>> Optimize();
         void GetReport();   // TODO: 
+        std::vector<std::pair<double, double>> GetJointLimits();    //TODO
+
+
 
     private:
         const int _num_joints;
@@ -36,5 +39,6 @@ class KOMO
 
         std::vector<double> _start_state;
         std::vector<double> _goal_state;
+        std::vector<std::pair<double, double>> _joint_limits;
 };
 

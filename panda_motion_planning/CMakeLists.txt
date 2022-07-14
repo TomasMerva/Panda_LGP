@@ -56,6 +56,9 @@ target_link_libraries(joint_variable ${catkin_LIBRARIES})
 # SET(NLOPT_LIBRARY "/usr/local/lib/libnlopt.so")
 # SET(NLOPT_LIBRARIES "/usr/local/lib/libnlopt.so.0")
 
+add_library(panda_kinematics_lib src/panda_kinematics.cpp)
+target_link_libraries(panda_kinematics_lib ${catkin_LIBRARIES})
+
 add_executable(komo src/komo.cpp)
 target_link_libraries(komo
                       komo_lib
@@ -63,13 +66,13 @@ target_link_libraries(komo
                       komo_k2_cost
                       "/usr/local/lib/libnlopt.so"
                       gnuplot_module
+                      panda_kinematics_lib
                       ${catkin_LIBRARIES}
                       ${Boost_LIBRARIES}
                       )
 
 
-add_library(panda_kinematics_lib src/panda_kinematics.cpp)
-target_link_libraries(panda_kinematics_lib ${catkin_LIBRARIES})
+
 
 add_executable(panda_motion_planning src/test.cpp )
 target_link_libraries(panda_motion_planning

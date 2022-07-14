@@ -43,6 +43,8 @@ void GnuplotModule::SubplotData(const std::vector<double> x_data, const std::vec
         plot_vector.push_back(temp);
     }
     int dim = y_data.size() / 2;
+
+
     Gnuplot gp;
     gp << "set multiplot layout " << dim << "," << dim << "\n";
     gp << "set style line " << _settings.line <<
@@ -53,8 +55,15 @@ void GnuplotModule::SubplotData(const std::vector<double> x_data, const std::vec
     
     for (int i=0; i<y_data.size(); i++)
     {
+        // gp << "set yrange[" << _y_limits[i].first << ":" << _y_limits[i].second << "]\n";
         gp << "plot" << gp.file1d(plot_vector[i]) << "with linespoints linestyle 1 title '" << labels[i] << "'\n";
     }
 
 
+}
+
+
+void GnuplotModule::Subplot_Yranges(std::vector<std::pair<double, double>> range)
+{
+  _y_limits = range;
 }

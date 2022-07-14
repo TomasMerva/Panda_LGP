@@ -59,20 +59,30 @@ void JointPositionController::starting(const ros::Time& /* time */) {
 
 void JointPositionController::update(const ros::Time& /*time*/,
                                             const ros::Duration& period) {
-  double distance_to_goal_point = 0;
 
-  for (int i=0; i<_NUM_JOINTS; i++)
+  double filter_value=0.001;
+  for (size_t i=0; i<_NUM_JOINTS; i++)
   {
-    distance_to_goal_point = _joint_position_goal[i] - position_joint_handles_[i].getPosition();
-
-    int direction = std::signbit(distance_to_goal_point)==1 ? -1 : 1;
-
-    if (std::fabs(distance_to_goal_point)>_POSITION_ACCURACY)
-    {
-      _joint_position_cmd[i] += (direction * _JOINT_VELOCITY * period.toSec());
-      position_joint_handles_[i].setCommand(_joint_position_cmd[i]);
-    }
+    _joint_position_prev[i] = filter_value*_joint_position_goal[i] + (1.0 - filter_value)*_joint_position_prev[i]; 
+    position_joint_handles_[i].setCommand(_joint_position_prev[i]);
   }
+ // velocity_cartesian_handle_->setCommand(_cartesian_velocity_prev);                                            
+
+  //------Second option--------------                                           
+  // double distance_to_goal_point = 0;
+
+  // for (int i=0; i<_NUM_JOINTS; i++)
+  // {
+  //   distance_to_goal_point = _joint_position_goal[i] - position_joint_handles_[i].getPosition();
+
+  //   int direction = std::signbit(distance_to_goal_point)==1 ? -1 : 1;
+
+  //   if (std::fabs(distance_to_goal_point)>_POSITION_ACCURACY)
+  //   {
+  //     _joint_position_cmd[i] += (direction * _JOINT_VELOCITY * period.toSec());
+  //     position_joint_handles_[i].setCommand(_joint_position_cmd[i]);
+  //   }
+  // }
 }
 
 void JointPositionController::JointPositionGoalCallback(const panda_gazebo_controllers::JointPosition::ConstPtr& msg)
