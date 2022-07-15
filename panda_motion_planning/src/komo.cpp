@@ -5,10 +5,6 @@
 #include <panda_motion_planning/komo_lib.h>
 #include <gnuplot_module/gnuplot_module.h>
 
-#include <panda_motion_planning/panda_kinematics.h>
-
-#include <nav_msgs/Path.h>
-#include <visualization_msgs/Marker.h>
 
 
 std::vector<double> q_start(7);
@@ -29,29 +25,30 @@ int main(int argc, char **argv)
     visualize_arg = argv[2];
     plot_arg = argv[3];
 
+    // ROS init
     ros::AsyncSpinner spinner(1);
     spinner.start();
-
     ros::Publisher joint_pub = nh.advertise<panda_gazebo_controllers::JointPosition>("/panda/joint_position_goal", 1000);
     ros::Subscriber joint_state_sub = nh.subscribe("/joint_states", 1, JointStateCallback);
 
     const int num_joints = 7;
     const int num_time_slices = 20;
-    // std::vector<double> q_goal{-0.2919, -0.785398163, 0, -2.35619449, 0, 1.57079632679, 0.785398163397};
-    std::vector<double> q_goal{-0.2919, -0.785398163, 0, -1.5, 0, 1.57079632679, 0.785398163397};
+    std::vector<double> init_pos{-0.4593, 0.3762, -0.1474, -2.0439, 0.0354, 2.4312, 0.1813};    // starting position
 
     // safety break
     ros::Duration(1).sleep();
 
     // KOMO
-    KOMO komo(num_joints, num_time_slices, 2);
-    komo.UpdateStates(q_start, q_goal);
+    KOMO komo(nh, num_joints, num_time_slices, 2);
+    komo.UpdateStates(q_start, init_pos);
     // each vector in results is separate joint, each joint consists of num_time_slices elements
     std::vector<std::vector<double>> results = komo.Optimize();
+    komo.ExecuteTrajectory(results, 5.0);   // init trajectory
 
-
-
-
+    ros::Duration(3).sleep();   // safety break
+    std::vector<double> goal_2{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
+    komo.UpdateStates(q_start, goal_2);
+    results = komo.Optimize();
 
     // Plot results
     if (plot_arg == "true")
@@ -63,46 +60,12 @@ int main(int argc, char **argv)
         plot.SubplotData(time, results, labels);
     }
 
-    ros::Publisher marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
     while(true)
     {
         if (visualize_arg == "true")
         {
-
-            std::unique_ptr<panda_kinematics::Kinematics> kin = std::make_unique<panda_kinematics::Kinematics>(&nh);
-
-            visualization_msgs::Marker line_strip;
-            line_strip.header.frame_id = "world";
-            line_strip.header.stamp = ros::Time::now();
-            line_strip.ns = "trajectory";
-            line_strip.action = visualization_msgs::Marker::ADD;
-            line_strip.pose.orientation.w = 1.0;
-            line_strip.id = 0;
-            line_strip.type = visualization_msgs::Marker::LINE_STRIP;
-            line_strip.scale.x = 0.01;
-            line_strip.color.g = 1.0;
-            line_strip.color.a = 1.0;
-            
-            for (size_t t=0; t < num_time_slices; t++)
-            {
-                std::array<double, 7> timestep_joints{results[0][t],
-                                                    results[1][t],
-                                                    results[2][t],
-                                                    results[3][t],
-                                                    results[4][t],
-                                                    results[5][t],
-                                                    results[6][t] };
-                Eigen::Matrix4d T = kin->ForwardKinematics(timestep_joints);
-                
-                geometry_msgs::Point p;
-                p.x = T(0,3);
-                p.y = T(1,3);
-                p.z = T(2,3);
-                line_strip.points.push_back(p);
-
-            }
-            marker_pub.publish(line_strip);
+            komo.VisualizeTrajectory(results, true);
         }
 
         std::string answer;
@@ -112,25 +75,13 @@ int main(int argc, char **argv)
         // Execute trajectory
         if (answer == "y")
         {
-            double dt = 5.0 / static_cast<double>(num_time_slices);
-            for (int i=0; i<num_time_slices; i++)
-            {
-                panda_gazebo_controllers::JointPosition msg;
-                msg.joint_position[0] = results[0][i];
-                msg.joint_position[1] = results[1][i];
-                msg.joint_position[2] = results[2][i];
-                msg.joint_position[3] = results[3][i];
-                msg.joint_position[4] = results[4][i];
-                msg.joint_position[5] = results[5][i];
-                msg.joint_position[6] = results[6][i];
-                
-                joint_pub.publish(msg);     
-                ros::Duration(dt).sleep();
-            }
+            komo.ExecuteTrajectory(results, 5.0);
         }
         ros::Duration(0.1).sleep();
     }
     
-    ros::waitForShutdown();
     return 0;
 }
+
+//[-0.4593389643071841, 0.3762131523805783, -0.14746962768825078, -2.0439627184936606, 0.03542332781547053, 2.4312440745296495, 0.18137867106475802]
+//[0.6569053790824997, 0.5686354077824252, 0.11562161775950397, -1.7390710728511003, -0.0550287460358696, 2.3598245597471994, 1.5583802506773168]

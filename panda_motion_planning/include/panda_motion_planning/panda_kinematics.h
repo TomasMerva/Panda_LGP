@@ -18,7 +18,7 @@ class Kinematics
         // Forward Kinematics
         Eigen::Matrix4d DH_matrix(const double a, const double d, 
                                   const double alpha, const double theta);
-        Eigen::Matrix4d ForwardKinematics(std::array<double, 7> joint_position);
+        Eigen::Matrix4d ForwardKinematics(std::array<double, 7> joint_position, bool gripper_enable);
 
         // Inverse Kinematics
         std::array<double, 7> InverseKinematics(std::array<double, 16> O_T_EE_array,

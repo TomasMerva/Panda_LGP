@@ -4,9 +4,10 @@
 /// \brief KOMO::KOMO Setting sizes of variables
 /// \param
 ///////////////////////////////////////////////////////////////////////
-KOMO::KOMO(const int num_joints, const int num_time_slices, const int k_order)
+KOMO::KOMO(ros::NodeHandle &nh, const int num_joints, const int num_time_slices, const int k_order)
     : _num_joints(num_joints)
     , _num_time_slices(num_time_slices)
+    , MotionPlanningTools(nh)
 {    
 }
 

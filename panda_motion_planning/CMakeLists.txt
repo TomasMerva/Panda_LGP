@@ -44,14 +44,17 @@ include_directories("/usr/local/include/gnuplot_module")
 
 
 #---- KOMO--------
-add_library(komo_lib src/komo_lib.cpp)
+add_library(komo_lib src/komo_lib.cpp src/motion_planning_tools.cpp)
 target_link_libraries(komo_lib ${catkin_LIBRARIES})
 
 add_library(joint_variable src/variables/joints.cpp)
 target_link_libraries(joint_variable ${catkin_LIBRARIES})
 
 add_library(komo_k2_cost src/objective/komo_k2.cpp)
-target_link_libraries(joint_variable ${catkin_LIBRARIES})
+target_link_libraries(komo_k2_cost ${catkin_LIBRARIES})
+
+# add_library(motion_planning_tools src/motion_planning_tools.cpp)
+# target_link_libraries(motion_planning_tools ${catkin_LIBRARIES})
 
 # SET(NLOPT_LIBRARY "/usr/local/lib/libnlopt.so")
 # SET(NLOPT_LIBRARIES "/usr/local/lib/libnlopt.so.0")

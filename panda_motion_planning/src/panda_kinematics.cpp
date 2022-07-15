@@ -22,17 +22,33 @@ Eigen::Matrix4d Kinematics::DH_matrix(const double a, const double d,
     return T;
 }
 
-Eigen::Matrix4d Kinematics::ForwardKinematics(std::array<double, 7> joint_position)
+Eigen::Matrix4d Kinematics::ForwardKinematics(std::array<double, 7> joint_position, bool gripper_enable)
 {
-    auto T1 = DH_matrix(0,          0.333,      0,            joint_position[0]);
-    auto T2 = DH_matrix(0,          0,          -M_PI_2,      joint_position[1]);
-    auto T3 = DH_matrix(0,          0.316,      M_PI_2,       joint_position[2]);
-    auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       joint_position[3]);
-    auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      joint_position[4]);
-    auto T6 = DH_matrix(0,          0,          M_PI_2,       joint_position[5]);
-    auto T7 = DH_matrix(0.088,      0,          M_PI_2,       joint_position[6]);
-    auto T8 = DH_matrix(0,          0.107,      0,            0);
-    return T1*T2*T3*T4*T5*T6*T7*T8;
+    if (gripper_enable)
+    {
+        auto T1 = DH_matrix(0,          0.333,      0,            joint_position[0]);
+        auto T2 = DH_matrix(0,          0,          -M_PI_2,      joint_position[1]);
+        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       joint_position[2]);
+        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       joint_position[3]);
+        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      joint_position[4]);
+        auto T6 = DH_matrix(0,          0,          M_PI_2,       joint_position[5]);
+        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       joint_position[6]);
+        auto T8 = DH_matrix(0,          0.107,      0,            0);
+        auto T9 = DH_matrix(0,          0.103,      0,            -0.785);
+        return T1*T2*T3*T4*T5*T6*T7*T8*T9; 
+    }
+    else
+    {
+        auto T1 = DH_matrix(0,          0.333,      0,            joint_position[0]);
+        auto T2 = DH_matrix(0,          0,          -M_PI_2,      joint_position[1]);
+        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       joint_position[2]);
+        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       joint_position[3]);
+        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      joint_position[4]);
+        auto T6 = DH_matrix(0,          0,          M_PI_2,       joint_position[5]);
+        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       joint_position[6]);
+        auto T8 = DH_matrix(0,          0.107,      0,            0);
+        return T1*T2*T3*T4*T5*T6*T7*T8;
+    }    
 }
 
 void Kinematics::FrankaStateCallback(const sensor_msgs::JointState &msg)

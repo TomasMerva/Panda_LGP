@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="rviz" default="false"  doc="Should Rviz be launched?" />
+    <arg name="rviz" default="true"  doc="Should Rviz be launched?" />
     <arg name="execution" default="false"  doc="Should trajectories be executed?" />
     <arg name="visualize" default="true"  doc="Should trajectories be visualized?" />
-    <arg name="plot" default="true"  doc="Should results be plotted?" />
+    <arg name="plot" default="false"  doc="Should results be plotted?" />
 
     <node pkg="panda_motion_planning" type="komo" output="screen" name="komo"  args="$(arg execution) $(arg visualize) $(arg plot)"/>
 
