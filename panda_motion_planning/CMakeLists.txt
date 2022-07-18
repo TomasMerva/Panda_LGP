@@ -42,16 +42,28 @@ include_directories("/usr/local/include/gnuplot_module")
 
 # include_directories("/home/tomas/Repos/gnuplot-iostream/gnuplot-iostream")
 
-
+#-----------------
 #---- KOMO--------
-add_library(komo_lib src/komo_lib.cpp src/motion_planning_tools.cpp)
+add_library(komo_lib SHARED
+  src/komo_lib.cpp 
+  src/motion_planning_tools.cpp
+  # decision variables
+  src/variables/joints.cpp
+  # objective function
+  src/objective/komo_k2.cpp
+  # constraints
+  src/constraints/add_point_to_point_distance.cpp
+)
 target_link_libraries(komo_lib ${catkin_LIBRARIES})
 
-add_library(joint_variable src/variables/joints.cpp)
-target_link_libraries(joint_variable ${catkin_LIBRARIES})
-
-add_library(komo_k2_cost src/objective/komo_k2.cpp)
-target_link_libraries(komo_k2_cost ${catkin_LIBRARIES})
+# add_library(komo_lib src/komo_lib.cpp src/motion_planning_tools.cpp)
+# target_link_libraries(komo_lib ${catkin_LIBRARIES})
+# # Decision variables
+# add_library(joint_variable src/variables/joints.cpp)
+# target_link_libraries(joint_variable ${catkin_LIBRARIES})
+# # D
+# add_library(komo_k2_cost src/objective/komo_k2.cpp)
+# target_link_libraries(komo_k2_cost ${catkin_LIBRARIES})
 
 # add_library(motion_planning_tools src/motion_planning_tools.cpp)
 # target_link_libraries(motion_planning_tools ${catkin_LIBRARIES})
@@ -65,8 +77,6 @@ target_link_libraries(panda_kinematics_lib ${catkin_LIBRARIES})
 add_executable(komo src/komo.cpp)
 target_link_libraries(komo
                       komo_lib
-                      joint_variable
-                      komo_k2_cost
                       "/usr/local/lib/libnlopt.so"
                       gnuplot_module
                       panda_kinematics_lib

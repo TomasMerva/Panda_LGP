@@ -13,7 +13,7 @@ namespace panda_kinematics{
 class Kinematics
 {
     public:
-        Kinematics(ros::NodeHandle *nh);
+        Kinematics();
 
         // Forward Kinematics
         Eigen::Matrix4d DH_matrix(const double a, const double d, 
@@ -25,14 +25,17 @@ class Kinematics
                                                 double q7,
                                                 std::array<double, 7> q_actual_array);
 
-        // Franka Joint State Callback
-        void FrankaStateCallback(const sensor_msgs::JointState &msg);
-
-        std::array<double, 7> _joint_position;
+        struct position
+        {
+            double x;
+            double y;
+            double z;
+        };
+        
 
     private:
-        ros::Subscriber _sub_franka_state;
 
 };
 
 } //namespace panda_kinematics
+

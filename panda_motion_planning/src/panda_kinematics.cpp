@@ -3,9 +3,8 @@
 namespace panda_kinematics
 {
 
-Kinematics::Kinematics(ros::NodeHandle *nh)
+Kinematics::Kinematics()
 {
-    // _sub_franka_state = nh->subscribe("/franka_state_controller/joint_states", 1, &Kinematics::FrankaStateCallback, this);
 }
 
 
@@ -49,11 +48,6 @@ Eigen::Matrix4d Kinematics::ForwardKinematics(std::array<double, 7> joint_positi
         auto T8 = DH_matrix(0,          0.107,      0,            0);
         return T1*T2*T3*T4*T5*T6*T7*T8;
     }    
-}
-
-void Kinematics::FrankaStateCallback(const sensor_msgs::JointState &msg)
-{
-    std::copy(std::begin(msg.position), std::end(msg.position), std::begin(_joint_position));
 }
 
 
