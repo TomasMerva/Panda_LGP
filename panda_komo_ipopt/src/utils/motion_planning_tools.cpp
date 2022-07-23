@@ -1,4 +1,4 @@
-#include <panda_motion_planning/motion_planning_tools.h>
+#include <panda_komo_ipopt/utils/motion_planning_tools.h>
 
 MotionPlanningTools::MotionPlanningTools(ros::NodeHandle &nh)
 {

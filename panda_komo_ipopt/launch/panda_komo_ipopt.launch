@@ -5,7 +5,7 @@
     <arg name="visualize" default="true"  doc="Should trajectories be visualized?" />
     <arg name="plot" default="true"  doc="Should results be plotted?" />
 
-    <node pkg="panda_motion_planning" type="komo" output="screen" name="komo"  args="$(arg execution) $(arg visualize) $(arg plot)"/>
+    <node pkg="panda_komo_ipopt" type="komo_ipopt" output="screen" name="komo_ipopt"  args="$(arg execution) $(arg visualize) $(arg plot)"/>
 
 
 

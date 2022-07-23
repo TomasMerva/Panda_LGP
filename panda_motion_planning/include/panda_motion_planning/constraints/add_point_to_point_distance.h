@@ -3,20 +3,21 @@
 #include <vector>
 #include <math.h>
 #include <Eigen/Dense>
-#include <panda_motion_planning/panda_kinematics.h>
+#include <panda_motion_planning/utils/panda_kinematics.h>
 
+#include <autodiff/forward/real.hpp>
+#include <autodiff/forward/real/eigen.hpp>
 
-class AddPointToPointDistanceConstraint : public panda_kinematics::Kinematics
+typedef struct {
+    int idx = 0;
+    double obj_pos_x;
+    double obj_pos_y;
+    double obj_pos_z;
+    double tolerance = 0.1;
+} AddPointToPointDistanceData;
+
+namespace Constraint
 {
-    public:
-        AddPointToPointDistanceConstraint(/* args */);
-        ~AddPointToPointDistanceConstraint();
-
-        double GetValues(const std::vector<double> &x, std::vector<double> &grad, void *data);
-        // double GetValues(const std::vector<double> &x);
-        void FillJacobianBlock(const std::vector<double> &x, std::vector<double> &jac);
-
-    private:
-        /* data */
-};
+    double AddPointToPointDistanceConstraint(const std::vector<double> &x, std::vector<double> &grad, void *data);
+}
 

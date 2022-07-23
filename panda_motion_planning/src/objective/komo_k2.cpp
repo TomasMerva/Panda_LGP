@@ -33,6 +33,7 @@ double KOMO_k2::GetCost(const std::vector<double> &x, std::vector<double> &grad,
     num_iterations++;
 
     if (!grad.empty()) {
+        std::fill(grad.begin(), grad.end(), 0.0);
         FillJacobianBlock(x, grad);
     }
 

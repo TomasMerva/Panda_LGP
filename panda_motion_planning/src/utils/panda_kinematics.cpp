@@ -1,13 +1,13 @@
-#include <panda_motion_planning/panda_kinematics.h>
-
-namespace panda_kinematics
-{
-
-Kinematics::Kinematics()
-{
-}
+#include <panda_motion_planning/utils/panda_kinematics.h>
 
 
+///////////////////////////////////////////////////////////////////////
+/// \brief Computes Denavit-Hartenberg matrix for the purpose of forward kinematics
+/// \param a -> distance between the z_i and z_{i-1} axes
+/// \param d -> signed distance between the x_i and x_{i-1} axes
+/// \param alpha -> angle between the z_i and z_{i-1} axes
+/// \param theta -> angle between the x_i and x_{i-1} axes (rotation about the z_i axis)
+///////////////////////////////////////////////////////////////////////
 Eigen::Matrix4d Kinematics::DH_matrix(const double a, const double d, 
                                       const double alpha, const double theta)
 {
@@ -21,34 +21,41 @@ Eigen::Matrix4d Kinematics::DH_matrix(const double a, const double d,
     return T;
 }
 
-Eigen::Matrix4d Kinematics::ForwardKinematics(std::array<double, 7> joint_position, bool gripper_enable)
+///////////////////////////////////////////////////////////////////////
+/// \brief Computes Forward kinematics for Franka Emika by multiplying DH matrices
+/// \param q -> joint angles
+/// \param gripper_enable -> is gripper used or not
+///////////////////////////////////////////////////////////////////////
+Eigen::Matrix4d Kinematics::ForwardKinematics(Eigen::VectorXd q, bool gripper_enable)
 {
     if (gripper_enable)
     {
-        auto T1 = DH_matrix(0,          0.333,      0,            joint_position[0]);
-        auto T2 = DH_matrix(0,          0,          -M_PI_2,      joint_position[1]);
-        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       joint_position[2]);
-        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       joint_position[3]);
-        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      joint_position[4]);
-        auto T6 = DH_matrix(0,          0,          M_PI_2,       joint_position[5]);
-        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       joint_position[6]);
-        auto T8 = DH_matrix(0,          0.107,      0,            0);
-        auto T9 = DH_matrix(0,          0.103,      0,            -0.785);
-        return T1*T2*T3*T4*T5*T6*T7*T8*T9; 
+        auto T1 = DH_matrix(0,          0.333,      0,            q(0));
+        auto T2 = DH_matrix(0,          0,          -M_PI_2,      q(1));
+        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       q(2));
+        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       q(3));
+        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      q(4));
+        auto T6 = DH_matrix(0,          0,          M_PI_2,       q(5));
+        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       q(6));
+        auto T8 = DH_matrix(0,          0.210,      0,            -0.785); // Flange and gripper frame is added to
+        return T1*T2*T3*T4*T5*T6*T7*T8; 
     }
     else
     {
-        auto T1 = DH_matrix(0,          0.333,      0,            joint_position[0]);
-        auto T2 = DH_matrix(0,          0,          -M_PI_2,      joint_position[1]);
-        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       joint_position[2]);
-        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       joint_position[3]);
-        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      joint_position[4]);
-        auto T6 = DH_matrix(0,          0,          M_PI_2,       joint_position[5]);
-        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       joint_position[6]);
+        auto T1 = DH_matrix(0,          0.333,      0,            q(0));
+        auto T2 = DH_matrix(0,          0,          -M_PI_2,      q(1));
+        auto T3 = DH_matrix(0,          0.316,      M_PI_2,       q(2));
+        auto T4 = DH_matrix(0.0825,     0,          M_PI_2,       q(3));
+        auto T5 = DH_matrix(-0.0825,    0.384,      -M_PI_2,      q(4));
+        auto T6 = DH_matrix(0,          0,          M_PI_2,       q(5));
+        auto T7 = DH_matrix(0.088,      0,          M_PI_2,       q(6));
         auto T8 = DH_matrix(0,          0.107,      0,            0);
         return T1*T2*T3*T4*T5*T6*T7*T8;
     }    
 }
+
+
+
 
 
 std::array<double, 7> Kinematics::InverseKinematics(std::array<double, 16> O_T_EE_array,
@@ -276,4 +283,3 @@ std::array<double, 7> Kinematics::InverseKinematics(std::array<double, 16> O_T_E
 
 
 
-}// namespace panda_kinematics
