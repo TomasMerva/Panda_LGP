@@ -19,24 +19,26 @@ std::vector<std::vector<double>> KOMO::Optimize()
     // 1. define a problem
     ifopt::Problem nlp;
     nlp.AddVariableSet(std::make_unique<JointVariables>("x", _num_joints, _num_time_slices, _q_start, _q_goal));
+    nlp.AddConstraintSet(std::make_unique<AddPointToPointDistanceConstraint>());
     nlp.AddCostSet(std::make_unique<KOMO_k2_Objective>("k_order=2", _num_joints, _num_time_slices));
     nlp.PrintCurrent();
 
     // 2. choose solver and options
     ifopt::IpoptSolver ipopt;
     // ipopt.SetOption("linear_solver", "");
-    ipopt.SetOption("jacobian_approximation", "exact");
+    // ipopt.SetOption("jacobian_approximation", "exact");
+    ipopt.SetOption("jacobian_approximation", "finite-difference-values");
     ipopt.SetOption("hessian_approximation", "limited-memory");
     ipopt.SetOption("max_iter", 10000);
-    ipopt.SetOption("tol", 1e-3);
-    ipopt.SetOption("acceptable_tol", 1e-3);
+    ipopt.SetOption("tol", 1e-2);
+    ipopt.SetOption("acceptable_tol", 1e-2);
     // ipopt.SetOption("derivative_test", "first-order");
     
     // 3. solve
     ipopt.Solve(nlp);
     int solver_status = ipopt.GetReturnStatus();    //TODO: handle error result
-
     Eigen::VectorXd q = nlp.GetOptVariables()->GetValues();
+    
     // 4. Return solution
     std::vector<std::vector<double>> q_time_steps;
     size_t idx=0;

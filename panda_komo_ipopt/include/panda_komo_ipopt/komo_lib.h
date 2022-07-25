@@ -9,6 +9,7 @@
 #include <ifopt/ipopt_solver.h>
 #include <panda_komo_ipopt/variables/joints.h>
 #include <panda_komo_ipopt/objectives/komo_k2.h>
+#include <panda_komo_ipopt/constraints/add_point_to_point_distance.h>
 
 #include <panda_komo_ipopt/utils/motion_planning_tools.h>
 
