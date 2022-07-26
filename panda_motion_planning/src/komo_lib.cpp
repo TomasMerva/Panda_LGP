@@ -53,13 +53,28 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
 
     // 4. set constraints
-    AddPointToPointDistanceData constraint_data[_num_time_slices];
-    for (int timestep=1; timestep < (_num_time_slices-1); timestep++)
-    {
-        constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.125, 0.6};
-        opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-8);
-    }
+    AddPointToPointDistanceData constraint_data[1];
+    constraint_data[0] = {5, 0.5, 0.0, 0.125, 0.4};
+    // constraint_data[1] = {2, 0.5, 0.0, 0.125, 0.3};
+    // constraint_data[2] = {3, 0.5, 0.0, 0.125, 0.3};
+    // constraint_data[3] = {4, 0.5, 0.0, 0.125, 0.3};
+    // constraint_data[4] = {5, 0.5, 0.0, 0.125, 0.3};
 
+
+    opt.add_equality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[0], 1e-10);
+    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[1], 1e-10);
+    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[2], 1e-10);
+    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[3], 1e-10);
+    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[4], 1e-10);
+
+
+    // AddPointToPointDistanceData constraint_data[_num_time_slices];
+    // for (int timestep=1; timestep < (_num_time_slices-1); timestep++)
+    // {
+    //     constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.125, 0.6};
+    //     opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-8);
+    // }
+    
     // opt.set_ftol_abs(1e-6);
     // opt.set_ftol_rel(1e-6);
     // std::cout << opt.get_ftol_abs() << " " << opt.get_ftol_rel() << std::endl; 
@@ -96,43 +111,95 @@ std::vector<std::vector<double>> KOMO::Optimize()
     {
         nlopt::result result = opt.optimize(q, min_obj_value);
         auto finish_time = high_resolution_clock::now();
-        duration<double, std::milli> ms_double = finish_time - start_time;
         std::cout << "------------------------------------------\n";
+        duration<double, std::milli> ms_double = finish_time - start_time;
         std::cout << "Number of iterations: \t=\t" << objective->num_iterations << "\n";
-        std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
-        std::cout << "NLOPT status: " << result << std::endl;
-        std::cout << "EXIT: Optimal Solution Found.\n--------" << std::endl;  
+        std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n"; 
+        switch (result)
+        {
+            // Positive messages
+            case 1:
+                std::cout << "NLOPT status: Generic success return value.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            case 2:
+                std::cout << "NLOPT status: Optimization stopped because `stopval` was reached.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            case 3:
+                std::cout << "NLOPT status: Optimization stopped because `ftol_rel` or `ftol_abs` was reached.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            case 4:
+                std::cout << "NLOPT status: Optimization stopped because `xtol_rel` or `xtol_abs` was reached.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            case 5:
+                std::cout << "NLOPT status: Optimization stopped because `maxeval` was reached.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            case 6:
+                std::cout << "NLOPT status: Optimization stopped because `maxtime` was reached.\n";
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                break;
+            // Negative messages
+            // case -1:
+            //     std::cout << "NLOPT status: Generic failure code.\n";
+            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n"; 
+            //     break;
+            // case -2:
+            //     std::cout << "NLOPT status: Invalid arguments (e.g. lower bounds are bigger than upper bounds, an unknown algorithm was specified, etcetera).\n";
+            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
+            //     break;
+            // case -3:
+            //     std::cout << "NLOPT status: Ran out of memory.\n";
+            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
+            //     break;
+            // case -4:
+            //     std::cout << "NLOPT status: Halted because roundoff errors limited progress. (In this case, the optimization still typically returns a useful result.)\n";
+            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
+            //     break;
+            // case -5:
+            //     std::cout << "NLOPT status: Halted because of a forced termination: The user called a stop function\n";
+            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
+            //     break;
+            default:
+                break;
+        }       
     }
     catch(std::exception &e) 
     {
-        std::cout << "nlopt failed: " << e.what() << std::endl;
+        std::cout << "nlopt failed: " << e.what() << std::endl;         
     }
 
+    // TODO : ADD success termination
+
+
     // --------------
-        // Return results
-        std::vector<std::vector<double>> q_time_steps;
-        size_t idx=0;
-        for (int col=0; col<_num_time_slices; col++)
+    // Return results
+    std::vector<std::vector<double>> q_time_steps;
+    size_t idx=0;
+    for (int col=0; col<_num_time_slices; col++)
+    {
+        std::vector<double> temp;
+        for (int row=0; row<_num_joints; row++)
         {
-            std::vector<double> temp;
-            for (int row=0; row<_num_joints; row++)
-            {
-                temp.push_back(q[idx]);
-                idx++;
-            }
-            q_time_steps.push_back(temp);
+            temp.push_back(q[idx]);
+            idx++;
         }
-        std::vector<double> q1, q2, q3, q4, q5, q6, q7;
-        for (int i=0; i<_num_time_slices; i++)
-        {
-            q1.push_back(q_time_steps[i][0]);
-            q2.push_back(q_time_steps[i][1]);
-            q3.push_back(q_time_steps[i][2]);
-            q4.push_back(q_time_steps[i][3]);
-            q5.push_back(q_time_steps[i][4]);
-            q6.push_back(q_time_steps[i][5]);
-            q7.push_back(q_time_steps[i][6]);
-        }
+        q_time_steps.push_back(temp);
+    }
+    std::vector<double> q1, q2, q3, q4, q5, q6, q7;
+    for (int i=0; i<_num_time_slices; i++)
+    {
+        q1.push_back(q_time_steps[i][0]);
+        q2.push_back(q_time_steps[i][1]);
+        q3.push_back(q_time_steps[i][2]);
+        q4.push_back(q_time_steps[i][3]);
+        q5.push_back(q_time_steps[i][4]);
+        q6.push_back(q_time_steps[i][5]);
+        q7.push_back(q_time_steps[i][6]);
+    }
     return std::vector<std::vector<double>>{q1, q2, q3, q4, q5, q6, q7};
 }
 

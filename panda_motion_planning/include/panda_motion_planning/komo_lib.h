@@ -57,6 +57,7 @@ class KOMO : public MotionPlanningTools
 
         const double _local_x_tol = 1e-6;
         const double _x_tol = 1e-6;
+        bool nlopt_success = false;
 
         std::vector<double> _start_state;
         std::vector<double> _goal_state;

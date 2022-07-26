@@ -19,7 +19,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
     // 1. define a problem
     ifopt::Problem nlp;
     nlp.AddVariableSet(std::make_unique<JointVariables>("x", _num_joints, _num_time_slices, _q_start, _q_goal));
-    nlp.AddConstraintSet(std::make_unique<AddPointToPointDistanceConstraint>());
+    // nlp.AddConstraintSet(std::make_unique<AddPointToPointDistanceConstraint>());
     nlp.AddCostSet(std::make_unique<KOMO_k2_Objective>("k_order=2", _num_joints, _num_time_slices));
     nlp.PrintCurrent();
 

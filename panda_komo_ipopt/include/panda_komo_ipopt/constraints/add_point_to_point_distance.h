@@ -35,6 +35,12 @@ class AddPointToPointDistanceConstraint : public ifopt::ConstraintSet {
         // // Attention: see the parent class function for important information on sparsity pattern.
         void FillJacobianBlock (std::string var_set, Jacobian& jac_block) const override;
 
+        static autodiff::MatrixXreal DH_matrix(const autodiff::real a, const autodiff::real d, 
+                                         const autodiff::real alpha, const autodiff::real theta);
+        static autodiff::real ComputePointToPointDistanceConstraint
+            (autodiff::VectorXreal q, autodiff::VectorXreal obj_position);                          
+
+
     private:
         double _tolerance;
 };

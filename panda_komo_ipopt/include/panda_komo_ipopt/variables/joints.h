@@ -2,6 +2,7 @@
 
 #include <ifopt/variable_set.h>
 #include <Eigen/Dense>
+#include <iostream>
 // #include <ifopt_test/tools_function.h>
 
 

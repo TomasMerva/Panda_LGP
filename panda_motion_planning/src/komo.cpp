@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     // g.GetValues(q);
 
     // safety break
-    ros::Duration(0.1).sleep();
+    ros::Duration(0.5).sleep();
 
     // KOMO
     KOMO komo(nh, num_joints, num_time_slices, 2);
@@ -47,13 +47,15 @@ int main(int argc, char **argv)
 //    komo.AddConstraint(FS_PointToPointDistance);
 
     // each vector in results is separate joint, each joint consists of num_time_slices elements
-    std::vector<std::vector<double>> results = komo.Optimize();
-    komo.VisualizeTrajectory(results, true);
-    ros::Duration(1).sleep();   // safety break
+    std::vector<std::vector<double>> results ;
+    //    std::vector<std::vector<double>> results = komo.Optimize();
 
-    komo.ExecuteTrajectory(results, 5.0);   // init trajectory
+    // komo.VisualizeTrajectory(results, true);
+    // ros::Duration(1).sleep();   // safety break
 
-    ros::Duration(3).sleep();   // safety break
+    // komo.ExecuteTrajectory(results, 5.0);   // init trajectory
+
+    // ros::Duration(3).sleep();   // safety break
     std::vector<double> goal_2{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
     komo.UpdateStates(q_start, goal_2);
     // komo.AddConstraint(FS_PointToPointDistance);
@@ -69,7 +71,7 @@ int main(int argc, char **argv)
         plot.SubplotData(time, results, labels);
     }
 
-
+    ros::Duration(0.5).sleep();
     while(true)
     {
         if (visualize_arg == "true")
