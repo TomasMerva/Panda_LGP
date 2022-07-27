@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 678
   - Class: rviz/Selection
@@ -136,8 +137,77 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        trajectory: true
       Queue Size: 100
+      Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        object:
+          Value: true
+        panda_EE:
+          Value: false
+        panda_K:
+          Value: false
+        panda_NE:
+          Value: false
+        panda_hand:
+          Value: false
+        panda_leftfinger:
+          Value: false
+        panda_link0:
+          Value: false
+        panda_link1:
+          Value: false
+        panda_link2:
+          Value: false
+        panda_link3:
+          Value: false
+        panda_link4:
+          Value: false
+        panda_link5:
+          Value: false
+        panda_link6:
+          Value: false
+        panda_link7:
+          Value: false
+        panda_link8:
+          Value: false
+        panda_rightfinger:
+          Value: false
+        world:
+          Value: false
+      Marker Alpha: 1
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          object:
+            {}
+          panda_link0:
+            panda_link1:
+              panda_link2:
+                panda_link3:
+                  panda_link4:
+                    panda_link5:
+                      panda_link6:
+                        panda_link7:
+                          panda_link8:
+                            panda_NE:
+                              panda_EE:
+                                panda_K:
+                                  {}
+                            panda_hand:
+                              panda_leftfinger:
+                                {}
+                              panda_rightfinger:
+                                {}
+      Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
@@ -167,7 +237,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.1567115783691406
+      Distance: 1.7397184371948242
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -175,17 +245,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.13547441363334656
-        Y: 0.07298911362886429
-        Z: 0.47458288073539734
+        X: 0.2967844605445862
+        Y: 0.0969088226556778
+        Z: 0.22206160426139832
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5753982067108154
+      Pitch: 0.2453986406326294
       Target Frame: <Fixed Frame>
-      Yaw: 5.548570156097412
+      Yaw: 5.7435784339904785
     Saved: ~
 Window Geometry:
   Displays:

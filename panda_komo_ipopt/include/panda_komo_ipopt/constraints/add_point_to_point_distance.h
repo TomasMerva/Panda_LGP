@@ -43,4 +43,10 @@ class AddPointToPointDistanceConstraint : public ifopt::ConstraintSet {
 
     private:
         double _tolerance;
+        Eigen::VectorXd _object_pos = Eigen::VectorXd(3);
+        // std::vector<Eigen::Matrix<double, -1, 1>> _jacobian;
+        // Eigen::MatrixXd _jacobian;
+        static std::vector<std::vector<double>> _g_jac;
+        // std::vector<std::vector<double>> test;
+
 };

@@ -9,6 +9,7 @@ AddPointToPointDistanceConstraint::AddPointToPointDistanceConstraint(const std::
     : ifopt::ConstraintSet(num_time_slices, name)
 {
     _tolerance = tolerance;
+    _object_pos << 0.5, 0, 0.1;
 }
 
 
@@ -17,26 +18,43 @@ Eigen::VectorXd AddPointToPointDistanceConstraint::GetValues() const
     VectorXd g(GetRows());
     VectorXd x = GetVariables()->GetComponent("x")->GetValues();
 
-    Eigen::VectorXd object_pos(3);
-    object_pos << 0.5, 0, 0.125;
+
 
     for (size_t idx=0; idx<20; idx++)
     {
         autodiff::VectorXreal x_autodiff = Eigen::Map<Eigen::Matrix<double, 7, 1> >(x.data()+idx*7, 7);
 
         autodiff::real g_autodiff;
-        Eigen::VectorXd gradient = autodiff::gradient(ComputePointToPointDistanceConstraint, wrt(x_autodiff), at(x_autodiff, object_pos), g_autodiff);
+        Eigen::VectorXd gradient = autodiff::gradient(ComputePointToPointDistanceConstraint, wrt(x_autodiff), at(x_autodiff, _object_pos), g_autodiff);
         g(idx) = g_autodiff.val();
-        std::cout << "g(idx) = " << g(idx) << std::endl;
+
+        std::vector<double> temp(gradient.data(), gradient.data()+gradient.rows());
+        std::vector<std::vector<double>> test;
+        std::cout << "TEMP: \n";
+        for (auto t : temp)
+        {
+            std::cout << t << " ";
+        }
+        std::cout << "\n";
+        test.push_back(temp);
+
+
+        _g_jac.push_back(temp);
+        // std::cout << temp << std::endl;
+        // std::cout << "g(idx) = " << g(idx) << std::endl;
+
 
         // Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*7, 7);
         // auto FK_q = Kinematics::ForwardKinematics(q, true);
         // Eigen::VectorXd pos_t(3);
         // pos_t << FK_q(0,3), FK_q(1,3), FK_q(2,3);
-        // auto diff_pos = pos_t - object_pos;
+        // auto diff_pos = pos_t - _object_pos;
+        // // std::cout << "Diff_pos: \n" << diff_pos << std::endl;
         // double l2_norm = sqrt(diff_pos.transpose() * diff_pos);
         // g(idx) = l2_norm;
+        std::cout << "gradient: \n" << gradient.transpose() << std::endl;
     }
+    std::cout << "G = \n" << g << std::endl;
     return g;
 }
 
@@ -57,8 +75,8 @@ void AddPointToPointDistanceConstraint::FillJacobianBlock (std::string var_set, 
     {
         VectorXd x = GetVariables()->GetComponent("x")->GetValues();
 
-        std::cout << "size of jac_constraint: " << jac_block.rows() << " " << jac_block.cols() << std::endl;
-
+        // Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*7, 7);
+        // jac_block.coeffRef(0, 0) = 
     }
 
 }

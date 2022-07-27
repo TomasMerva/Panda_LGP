@@ -87,12 +87,11 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    
     <state world_name='default'>
-      <sim_time>243 217000000</sim_time>
-      <real_time>243 325796879</real_time>
-      <wall_time>1658324604 886282471</wall_time>
-      <iterations>243217</iterations>
+      <sim_time>497 717000000</sim_time>
+      <real_time>254 590742245</real_time>
+      <wall_time>1658922577 336177817</wall_time>
+      <iterations>254500</iterations>
       <model name='ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -103,21 +102,29 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-     
+      
       <model name='unit_box'>
-        <pose>0.449999 0 0.125 0 -0 0</pose>
+        <pose>0.5 -0 0.1 0 0 -0.000154</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose>0.449999 0 0.125 0 -0 0</pose>
+          <pose>0.5 -0 0.1 0 0 -0.000154</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.001089 -0.001078 -1e-06 0.008628 0.008713 -1e-06</acceleration>
-          <wrench>0.108908 -0.107844 -0.000146 0 -0 0</wrench>
+          <acceleration>-0 -0 0 0 -0 0</acceleration>
+          <wrench>-1e-06 -1e-06 0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>2.32008 -2.14478 1.75903 0 0.442638 2.39656</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    
     <model name='unit_box'>
       <link name='link'>
         <inertial>
@@ -140,20 +147,20 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.25 0.25 0.25</size>
+              <size>0.2 0.2 0.2</size>
             </box>
           </geometry>
           <material>
             <script>
-              <name>Gazebo/Grey</name>
+              <name>Gazebo/Red</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
             <shader type='pixel'>
               <normal_map>__default__</normal_map>
             </shader>
-            <ambient>0.3 0.3 0.3 1</ambient>
-            <diffuse>0.7 0.7 0.7 1</diffuse>
-            <specular>0.01 0.01 0.01 1</specular>
+            <ambient>1 0.3 0.3 1</ambient>
+            <diffuse>1 0.7 0.7 1</diffuse>
+            <specular>1 0.01 0.01 1</specular>
             <emissive>0 0 0 1</emissive>
           </material>
           <pose>0 0 0 0 -0 0</pose>
@@ -166,7 +173,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.25 0.25 0.25</size>
+              <size>0.2 0.2 0.2</size>
             </box>
           </geometry>
           <surface>
@@ -218,14 +225,7 @@
       </link>
       <static>0</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose>2 0.081416 0.499995 0 1e-05 -0.000154</pose>
+      <pose>0.499999 -0 0.1 -0 -0 -0.000154</pose>
     </model>
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
-        <pose>3.78416 -2.57597 2.0339 -0 0.342638 2.43258</pose>
-        <view_controller>orbit</view_controller>
-        <projection_type>perspective</projection_type>
-      </camera>
-    </gui>
   </world>
 </sdf>

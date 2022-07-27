@@ -23,7 +23,6 @@ JointVariables::JointVariables(const std::string& name, const int num_variables,
     _q.col(0) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_start.data(), _q_start.size());
     _q.col(num_time_slices-1) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(_q_goal.data(), _q_goal.size());
 
-    std::cout << "x = \n" << _q << std::endl;
 }
 
 

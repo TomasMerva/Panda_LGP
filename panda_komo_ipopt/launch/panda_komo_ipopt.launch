@@ -8,7 +8,6 @@
     <node pkg="panda_komo_ipopt" type="komo_ipopt" output="screen" name="komo_ipopt"  args="$(arg execution) $(arg visualize) $(arg plot)"/>
 
 
-
     <node  pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find panda_gazebo_bringup)/config/model.rviz" if="$(arg rviz)"/>
 
 
