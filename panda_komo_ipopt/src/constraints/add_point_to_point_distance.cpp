@@ -1,5 +1,8 @@
 #include <panda_komo_ipopt/constraints/add_point_to_point_distance.h>
 
+std::vector<std::vector<double>> AddPointToPointDistanceConstraint::g_jac;
+
+
 AddPointToPointDistanceConstraint::AddPointToPointDistanceConstraint()
     : AddPointToPointDistanceConstraint("point_to_point_distance_constraint", 20, 0.3)
 {
@@ -17,7 +20,7 @@ Eigen::VectorXd AddPointToPointDistanceConstraint::GetValues() const
 {
     VectorXd g(GetRows());
     VectorXd x = GetVariables()->GetComponent("x")->GetValues();
-
+    g_jac.clear();
 
 
     for (size_t idx=0; idx<20; idx++)
@@ -28,18 +31,9 @@ Eigen::VectorXd AddPointToPointDistanceConstraint::GetValues() const
         Eigen::VectorXd gradient = autodiff::gradient(ComputePointToPointDistanceConstraint, wrt(x_autodiff), at(x_autodiff, _object_pos), g_autodiff);
         g(idx) = g_autodiff.val();
 
-        std::vector<double> temp(gradient.data(), gradient.data()+gradient.rows());
-        std::vector<std::vector<double>> test;
-        std::cout << "TEMP: \n";
-        for (auto t : temp)
-        {
-            std::cout << t << " ";
-        }
-        std::cout << "\n";
-        test.push_back(temp);
-
-
-        _g_jac.push_back(temp);
+        // std::vector<double> temp(gradient.data(), gradient.data()+gradient.rows());
+        // g_jac.push_back(temp);
+        g_jac.push_back(std::vector<double>(gradient.data(), gradient.data()+gradient.rows()));
         // std::cout << temp << std::endl;
         // std::cout << "g(idx) = " << g(idx) << std::endl;
 
@@ -52,9 +46,9 @@ Eigen::VectorXd AddPointToPointDistanceConstraint::GetValues() const
         // // std::cout << "Diff_pos: \n" << diff_pos << std::endl;
         // double l2_norm = sqrt(diff_pos.transpose() * diff_pos);
         // g(idx) = l2_norm;
-        std::cout << "gradient: \n" << gradient.transpose() << std::endl;
+        // std::cout << "gradient: \n" << gradient.transpose() << std::endl;
     }
-    std::cout << "G = \n" << g << std::endl;
+    // std::cout << "G = \n" << g << std::endl;
     return g;
 }
 
@@ -76,7 +70,41 @@ void AddPointToPointDistanceConstraint::FillJacobianBlock (std::string var_set, 
         VectorXd x = GetVariables()->GetComponent("x")->GetValues();
 
         // Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*7, 7);
-        // jac_block.coeffRef(0, 0) = 
+        // std::cout << "rows: " << jac_block.rows() << "\t cols: " << jac_block.cols() << std::endl;
+
+        // First row
+
+        for (size_t idx=0; idx < 7; idx++)
+        {
+            jac_block.coeffRef(0, idx+7*0) = g_jac[0][idx];
+            jac_block.coeffRef(1, idx+7*1) = g_jac[1][idx];
+            jac_block.coeffRef(2, idx+7*2) = g_jac[2][idx];
+            jac_block.coeffRef(3, idx+7*3) = g_jac[3][idx];
+            jac_block.coeffRef(4, idx+7*4) = g_jac[4][idx];
+            jac_block.coeffRef(5, idx+7*5) = g_jac[5][idx];
+            jac_block.coeffRef(6, idx+7*6) = g_jac[6][idx];
+            jac_block.coeffRef(7, idx+7*7) = g_jac[7][idx];
+            jac_block.coeffRef(8, idx+7*8) = g_jac[8][idx];
+            jac_block.coeffRef(9, idx+7*9) = g_jac[9][idx];
+            jac_block.coeffRef(10, idx+7*10) = g_jac[10][idx];
+            jac_block.coeffRef(11, idx+7*11) = g_jac[11][idx];
+            jac_block.coeffRef(12, idx+7*12) = g_jac[12][idx];
+            jac_block.coeffRef(13, idx+7*13) = g_jac[13][idx];
+            jac_block.coeffRef(14, idx+7*14) = g_jac[14][idx];
+            jac_block.coeffRef(15, idx+7*15) = g_jac[15][idx];
+            jac_block.coeffRef(16, idx+7*16) = g_jac[16][idx];
+            jac_block.coeffRef(17, idx+7*17) = g_jac[17][idx];
+            jac_block.coeffRef(18, idx+7*18) = g_jac[18][idx];
+            jac_block.coeffRef(19, idx+7*19) = g_jac[19][idx];
+        }
+
+        // for (size_t row=0; row < 20; row++)
+        // {
+        //     for (size_t idx=0; idx < 7; idx++)
+        //     {
+        //         jac_block.coeffRef(row, idx+7*row) = g_jac[row][idx];
+        //     }
+        // }
     }
 
 }

@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 
     const int num_joints = 7;
     const int num_time_slices = 20;
-    std::vector<double> init_pos{-0.7, 0.3762, -0.1474, -2.0439, 0.0354, 2.4312, 0.1813};    // starting position
+    std::vector<double> q_goal{0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019}; 
 
 
     // std::vector<double> q{-0.7, 0.3762, -0.1474, -2.0439, 0.0354, 2.4312, 0.1813, -0.4, 0.3762, -0.1474, -1.5, 0.0, 2.0, 0.0};    // starting position
@@ -43,12 +43,12 @@ int main(int argc, char **argv)
 
     // KOMO
     KOMO komo(nh, num_joints, num_time_slices, 2);
-    komo.UpdateStates(q_start, init_pos);
+    komo.UpdateStates(q_start, q_goal);
 //    komo.AddConstraint(FS_PointToPointDistance);
 
     // each vector in results is separate joint, each joint consists of num_time_slices elements
-    std::vector<std::vector<double>> results ;
-    //    std::vector<std::vector<double>> results = komo.Optimize();
+    // std::vector<std::vector<double>> results ;
+    std::vector<std::vector<double>> results = komo.Optimize();
 
     // komo.VisualizeTrajectory(results, true);
     // ros::Duration(1).sleep();   // safety break
@@ -56,10 +56,10 @@ int main(int argc, char **argv)
     // komo.ExecuteTrajectory(results, 5.0);   // init trajectory
 
     // ros::Duration(3).sleep();   // safety break
-    std::vector<double> goal_2{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
-    komo.UpdateStates(q_start, goal_2);
-    // komo.AddConstraint(FS_PointToPointDistance);
-    results = komo.Optimize();
+    // std::vector<double> goal_2{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
+    // komo.UpdateStates(q_start, goal_2);
+    // // komo.AddConstraint(FS_PointToPointDistance);
+    // results = komo.Optimize();
 
     // Plot results
     if (plot_arg == "true")

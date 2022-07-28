@@ -44,41 +44,41 @@ int main(int argc, char **argv)
 
     KOMO komo(nh, num_joints, num_time_slices);
     komo.UpdateStates(q_start, q_goal);
-    komo.Optimize();
-    // std::vector<std::vector<double>> results = komo.Optimize();
+    // komo.Optimize();
+    std::vector<std::vector<double>> results = komo.Optimize();
 
 
-    // ros::Duration(2).sleep();
-    // // Plot results
-    // if (plot_arg == "true")
-    // {
-    //     GnuplotModule plot;
-    //     // plot.Subplot_Yranges(komo.GetJointLimits());
-    //     std::vector<double> time = linspace(0, 5, num_time_slices);
-    //     std::vector<std::string> labels{"q1", "q2", "q3", "q4", "q5", "q6", "q7"};
-    //     plot.SubplotData(time, results, labels);
-    // }
+    ros::Duration(2).sleep();
+    // Plot results
+    if (plot_arg == "true")
+    {
+        GnuplotModule plot;
+        // plot.Subplot_Yranges(komo.GetJointLimits());
+        std::vector<double> time = linspace(0, 5, num_time_slices);
+        std::vector<std::string> labels{"q1", "q2", "q3", "q4", "q5", "q6", "q7"};
+        plot.SubplotData(time, results, labels);
+    }
 
-    // while (true)
-    // {
-    //     if(visualize_arg == "true")
-    //     {
-    //         komo.VisualizeTrajectory(results, true);;
-    //     }
-    //     std::string answer;
-    //     std::cout << "Do you want to execute?";
-    //     std::cin >> answer;
-    //     // Execute trajectory
-    //     if (answer == "y")
-    //     {
-    //         komo.ExecuteTrajectory(results, 5.0);
-    //     }
-    //     else
-    //     {
-    //         return 0;
-    //     }
-    //     ros::Duration(0.1).sleep();
-    // }
+    while (true)
+    {
+        if(visualize_arg == "true")
+        {
+            komo.VisualizeTrajectory(results, true);;
+        }
+        std::string answer;
+        std::cout << "Do you want to execute?";
+        std::cin >> answer;
+        // Execute trajectory
+        if (answer == "y")
+        {
+            komo.ExecuteTrajectory(results, 5.0);
+        }
+        else
+        {
+            return 0;
+        }
+        ros::Duration(0.1).sleep();
+    }
 
     return 0;
 }

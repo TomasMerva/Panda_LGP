@@ -34,14 +34,17 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
     // 1. choose solvers
     // nlopt::algorithm::LD_AUGLAG_EQ
-    nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, x->GetNumVariables());
+    nlopt::opt opt(nlopt::algorithm::AUGLAG, x->GetNumVariables());
     nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND, x->GetNumVariables());
-    // nlopt::opt local_opt(nlopt::algorithm::LD_MMA, x->GetNumVariables());
-    //LD_SLSQP
-    local_opt.set_xtol_rel(_local_x_tol);
+    // nlopt::opt local_opt(nlopt::algorithm::LD_SLSQP, x->GetNumVariables());
+    //LD_SLSQP LD_MMA LD_TNEWTON_PRECOND
+
+    // local_opt.set_xtol_rel(_local_x_tol);
+    // opt.set_xtol_rel(_x_tol);
+    local_opt.set_xtol_abs(0.01);
     opt.set_local_optimizer(local_opt);
-    opt.set_xtol_rel(_x_tol);
     opt.set_maxtime(60);
+    opt.set_xtol_abs(0.0001);
     
     // 2. set bounds
     x->SetBoundaryConstraints(_start_state, _goal_state);
@@ -53,15 +56,17 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
 
     // 4. set constraints
-    AddPointToPointDistanceData constraint_data[1];
-    constraint_data[0] = {5, 0.5, 0.0, 0.125, 0.4};
-    // constraint_data[1] = {2, 0.5, 0.0, 0.125, 0.3};
-    // constraint_data[2] = {3, 0.5, 0.0, 0.125, 0.3};
-    // constraint_data[3] = {4, 0.5, 0.0, 0.125, 0.3};
-    // constraint_data[4] = {5, 0.5, 0.0, 0.125, 0.3};
+    AddPointToPointDistanceData constraint_data[20];
+    int g_idx = 0;
+    for (auto &g : constraint_data)
+    {
+        g = {g_idx, 0.5, 0.0, 0.1, 0.3};
+        opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &g, 1e-10);
+        g_idx++;
+    }
 
 
-    opt.add_equality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[0], 1e-10);
+    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[0], 1e-10);
     // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[1], 1e-10);
     // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[2], 1e-10);
     // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[3], 1e-10);
@@ -71,8 +76,8 @@ std::vector<std::vector<double>> KOMO::Optimize()
     // AddPointToPointDistanceData constraint_data[_num_time_slices];
     // for (int timestep=1; timestep < (_num_time_slices-1); timestep++)
     // {
-    //     constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.125, 0.6};
-    //     opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-8);
+    //     constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.1, 0.3};
+    //     opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-10);
     // }
     
     // opt.set_ftol_abs(1e-6);

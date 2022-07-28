@@ -40,13 +40,13 @@ class AddPointToPointDistanceConstraint : public ifopt::ConstraintSet {
         static autodiff::real ComputePointToPointDistanceConstraint
             (autodiff::VectorXreal q, autodiff::VectorXreal obj_position);                          
 
+        static std::vector<std::vector<double>> g_jac;
 
     private:
         double _tolerance;
         Eigen::VectorXd _object_pos = Eigen::VectorXd(3);
         // std::vector<Eigen::Matrix<double, -1, 1>> _jacobian;
         // Eigen::MatrixXd _jacobian;
-        static std::vector<std::vector<double>> _g_jac;
         // std::vector<std::vector<double>> test;
 
 };

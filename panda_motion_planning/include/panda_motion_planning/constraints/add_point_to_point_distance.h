@@ -19,5 +19,12 @@ typedef struct {
 namespace Constraint
 {
     double AddPointToPointDistanceConstraint(const std::vector<double> &x, std::vector<double> &grad, void *data);
+    
 }
 
+namespace ConstraintTools
+{
+    autodiff::MatrixXreal DH_matrix(const autodiff::real a, const autodiff::real d, 
+                                    const autodiff::real alpha, const autodiff::real theta);
+    static autodiff::real ComputePointToPointDistanceConstraint (autodiff::VectorXreal q, autodiff::VectorXreal obj_position);     
+}
