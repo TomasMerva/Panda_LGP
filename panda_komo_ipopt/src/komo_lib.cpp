@@ -35,6 +35,9 @@ std::vector<std::vector<double>> KOMO::Optimize()
     ipopt.SetOption("max_iter", 10000);
     ipopt.SetOption("tol", 1e-2);
     ipopt.SetOption("acceptable_tol", 1e-2);
+    ipopt.SetOption("nlp_scaling_max_gradient", 100.0);
+
+    
     // ipopt.SetOption("derivative_test", "first-order");
     
     // 3. solve

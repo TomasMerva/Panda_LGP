@@ -69,21 +69,47 @@ std::vector<double> JointsVariable::InitialGuess(const std::vector<double> start
 {
     std::vector<double> init(_num_variables*_num_time_slices);
     int idx = 0;
-    for (size_t col=0; col<_num_time_slices; col++)
+
+
+  // Initial guess
+    for (int i=0; i<_num_variables; i++)
     {
-        for (size_t row=0; row<_num_variables; row++)
+        //  auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
+        auto temp_init = linspace(start_state[i], goal_state[i], _num_time_slices);
+        _q.row(i) = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(temp_init.data(), temp_init.size());
+        _q.col(_num_time_slices-1) = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(goal_state.data(), goal_state.size());
+    }
+
+
+    for (int i=0; i<_q.cols(); i++)
+    {
+        for (int j=0; j<_q.rows(); j++)
         {
-            init[idx] = start_state[row];
+            init[idx] = _q(j, i);
             idx++;
         }
     }
+    // std::cout << "init = \n" << _q << std::endl;
 
-    idx = _num_variables* (_num_time_slices-1);
-    for (int i=0; i<_num_variables; i++)
-    {
-        init[idx] = goal_state[i];
-        idx++;
-    }
+
+
+
+    // int idx = 0;
+    // for (size_t col=0; col<_num_time_slices; col++)
+    // {
+    //     for (size_t row=0; row<_num_variables; row++)
+    //     {
+    //         init[idx] = start_state[row];
+    //         idx++;
+    //     }
+    // }
+
+    // idx = _num_variables* (_num_time_slices-1);
+    // for (int i=0; i<_num_variables; i++)
+    // {
+    //     init[idx] = goal_state[i];
+    //     idx++;
+    // }
     return init;
 }
 

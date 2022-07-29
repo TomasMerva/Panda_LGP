@@ -28,8 +28,8 @@ double Constraint::AddPointToPointDistanceConstraint(const std::vector<double> &
         // std::cout << std::endl;
         // std::cout << std::endl;
     }
-    double g = g_autodiff.val() - tolerance;
-    return g;
+    // double g = - g_autodiff.val() + tolerance;
+    return g_autodiff.val();
 }
 
 
@@ -65,5 +65,5 @@ autodiff::real ConstraintTools::ComputePointToPointDistanceConstraint(autodiff::
 
     // 3.step: Compute Euclidean distance between EEF and object position
     auto temp = eef_position-obj_position;
-    return sqrt((temp.transpose()*temp)[0]);
+    return - sqrt((temp.transpose()*temp)[0]) + 0.3;
 }

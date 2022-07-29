@@ -33,9 +33,9 @@ std::vector<std::vector<double>> KOMO::Optimize()
     std::unique_ptr<KOMO_k2> objective = std::make_unique<KOMO_k2>(_num_joints, _num_time_slices); 
 
     // 1. choose solvers
-    // nlopt::algorithm::LD_AUGLAG_EQ
+    // nlopt::algorithm::LD_AUGLAG_EQ AUGLAG
     nlopt::opt opt(nlopt::algorithm::AUGLAG, x->GetNumVariables());
-    nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND, x->GetNumVariables());
+    nlopt::opt local_opt(nlopt::algorithm::LD_MMA, x->GetNumVariables());
     // nlopt::opt local_opt(nlopt::algorithm::LD_SLSQP, x->GetNumVariables());
     //LD_SLSQP LD_MMA LD_TNEWTON_PRECOND
 
@@ -57,12 +57,45 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
     // 4. set constraints
     AddPointToPointDistanceData constraint_data[20];
-    int g_idx = 0;
-    for (auto &g : constraint_data)
+    std::vector<nlopt::vfunc> nlopt_constraints;
+
+    for(size_t i =0; i< _num_time_slices; i++)
     {
-        g = {g_idx, 0.5, 0.0, 0.1, 0.3};
-        opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &g, 1e-10);
-        g_idx++;
+        nlopt_constraints.push_back([](const std::vector<double>& x, std::vector<double>& grad, void* data) -> double {
+            AddPointToPointDistanceData *d = reinterpret_cast<AddPointToPointDistanceData*>(data);
+            int num_variables = 7;
+            int idx = d->idx; 
+            Eigen::VectorXd obj_pos(3);
+            obj_pos << d->obj_pos_x, d->obj_pos_y, d->obj_pos_z;
+            double tolerance = d->tolerance;
+
+            autodiff::VectorXreal q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*num_variables, num_variables);
+            autodiff::real g_autodiff;
+            Eigen::VectorXd gradient = autodiff::gradient(ConstraintTools::ComputePointToPointDistanceConstraint, wrt(q), at(q, obj_pos), g_autodiff);
+
+            if (!grad.empty())
+            {
+                std::fill(grad.begin(), grad.end(), 0);
+                for (size_t i=0; i<7; i++)
+                {
+                    grad[i + 7*idx] = gradient[i];
+                }
+                // for (auto grad_el : grad)
+                // {
+                //     std::cout << grad_el << " ";
+                // }
+                // std::cout << std::endl;
+                // std::cout << std::endl;
+            }
+            return g_autodiff.val();
+        });
+    }
+
+    const double kTolerance = 1e-4;
+    for (int i=0; i<_num_time_slices; i++)
+    {
+        constraint_data[i] = {i, 0.5, 0.0, 0.1, 0.3};
+        opt.add_inequality_constraint(nlopt_constraints[i], &constraint_data[i], kTolerance);
     }
 
 
