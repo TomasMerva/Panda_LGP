@@ -60,7 +60,7 @@ void JointPositionController::starting(const ros::Time& /* time */) {
 void JointPositionController::update(const ros::Time& /*time*/,
                                             const ros::Duration& period) {
 
-  double filter_value=0.01;
+  double filter_value=0.005;
   for (size_t i=0; i<_NUM_JOINTS; i++)
   {
     _joint_position_prev[i] = filter_value*_joint_position_goal[i] + (1.0 - filter_value)*_joint_position_prev[i]; 

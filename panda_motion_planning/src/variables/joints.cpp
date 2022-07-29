@@ -71,7 +71,7 @@ std::vector<double> JointsVariable::InitialGuess(const std::vector<double> start
     int idx = 0;
 
 
-  // Initial guess
+//   // Initial guess
     for (int i=0; i<_num_variables; i++)
     {
         //  auto temp_init = linspace(q_start[i], q_goal[i], num_time_slices);
@@ -94,7 +94,6 @@ std::vector<double> JointsVariable::InitialGuess(const std::vector<double> start
 
 
 
-    // int idx = 0;
     // for (size_t col=0; col<_num_time_slices; col++)
     // {
     //     for (size_t row=0; row<_num_variables; row++)

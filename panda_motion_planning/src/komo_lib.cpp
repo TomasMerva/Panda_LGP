@@ -35,12 +35,10 @@ std::vector<std::vector<double>> KOMO::Optimize()
     // 1. choose solvers
     // nlopt::algorithm::LD_AUGLAG_EQ AUGLAG
     nlopt::opt opt(nlopt::algorithm::AUGLAG, x->GetNumVariables());
-    nlopt::opt local_opt(nlopt::algorithm::LD_MMA, x->GetNumVariables());
+    nlopt::opt local_opt(nlopt::algorithm::LD_LBFGS, x->GetNumVariables());
     // nlopt::opt local_opt(nlopt::algorithm::LD_SLSQP, x->GetNumVariables());
-    //LD_SLSQP LD_MMA LD_TNEWTON_PRECOND
+    //LD_SLSQP LD_MMA LD_TNEWTON_PRECOND LD_LBFGS
 
-    // local_opt.set_xtol_rel(_local_x_tol);
-    // opt.set_xtol_rel(_x_tol);
     local_opt.set_xtol_abs(0.01);
     opt.set_local_optimizer(local_opt);
     opt.set_maxtime(60);
@@ -68,26 +66,37 @@ std::vector<std::vector<double>> KOMO::Optimize()
             Eigen::VectorXd obj_pos(3);
             obj_pos << d->obj_pos_x, d->obj_pos_y, d->obj_pos_z;
             double tolerance = d->tolerance;
+            double delta_q = 0.001;
 
-            autodiff::VectorXreal q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*num_variables, num_variables);
-            autodiff::real g_autodiff;
-            Eigen::VectorXd gradient = autodiff::gradient(ConstraintTools::ComputePointToPointDistanceConstraint, wrt(q), at(q, obj_pos), g_autodiff);
+            Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*num_variables, num_variables);
+
+            auto FK_q = Kinematics::ForwardKinematics(q, true);
+            Eigen::VectorXd pos_t(3);
+            pos_t << FK_q(0,3), FK_q(1,3), FK_q(2,3);
+            auto diff_pos = obj_pos - pos_t;
+            double l2_norm = - sqrt((diff_pos.transpose()*diff_pos)[0]) + 0.3;
 
             if (!grad.empty())
             {
                 std::fill(grad.begin(), grad.end(), 0);
-                for (size_t i=0; i<7; i++)
+                Eigen::MatrixXd J(3, num_variables);
+                for (int i=0; i<num_variables; i++)
                 {
-                    grad[i + 7*idx] = gradient[i];
+                    auto temp = q;
+                    temp(i) += delta_q; // ad delta_q to the q(i)
+                    auto FK_with_deltaq = Kinematics::ForwardKinematics(temp, true); //compute FK with q(i)+delta_q
+                    J(0, i) = (FK_with_deltaq(0,3) - FK_q(0,3)) / delta_q;  // dx / dq(i)
+                    J(1, i) = (FK_with_deltaq(1,3) - FK_q(1,3)) / delta_q;  // dy / dq(i)
+                    J(2, i) = (FK_with_deltaq(2,3) - FK_q(2,3)) / delta_q;  // dz / dq(i)
                 }
-                // for (auto grad_el : grad)
-                // {
-                //     std::cout << grad_el << " ";
-                // }
-                // std::cout << std::endl;
-                // std::cout << std::endl;
+                auto dg = diff_pos.transpose()*J;
+                for (int i=0; i<num_variables; i++)
+                {
+                    grad[i + idx*num_variables] = dg[i];
+                }
+                
             }
-            return g_autodiff.val();
+            return l2_norm;
         });
     }
 

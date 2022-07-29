@@ -25,28 +25,45 @@ Eigen::VectorXd AddPointToPointDistanceConstraint::GetValues() const
 
     for (size_t idx=0; idx<20; idx++)
     {
-        autodiff::VectorXreal x_autodiff = Eigen::Map<Eigen::Matrix<double, 7, 1> >(x.data()+idx*7, 7);
+        Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*7, 7);
+        auto FK_q = Kinematics::ForwardKinematics(q, true);
+        Eigen::VectorXd pos_t(3);
+        pos_t << FK_q(0,3), FK_q(1,3), FK_q(2,3);
+        auto diff_pos = _object_pos - pos_t;
+        double l2_norm = sqrt((diff_pos.transpose()*diff_pos)[0]) - 0.3;
 
-        autodiff::real g_autodiff;
-        Eigen::VectorXd gradient = autodiff::gradient(ComputePointToPointDistanceConstraint, wrt(x_autodiff), at(x_autodiff, _object_pos), g_autodiff);
-        g(idx) = g_autodiff.val();
+        g(idx) = l2_norm;
 
-        // std::vector<double> temp(gradient.data(), gradient.data()+gradient.rows());
-        // g_jac.push_back(temp);
-        g_jac.push_back(std::vector<double>(gradient.data(), gradient.data()+gradient.rows()));
+        //compute jacobian
+        double delta_q = 0.001;
+        Eigen::MatrixXd J(3, 7);
+        for (int i=0; i<7; i++)
+        {
+            auto temp = q;
+            temp(i) += delta_q; // ad delta_q to the q(i)
+            auto FK_with_deltaq = Kinematics::ForwardKinematics(temp, true); //compute FK with q(i)+delta_q
+            J(0, i) = (FK_with_deltaq(0,3) - FK_q(0,3)) / delta_q;  // dx / dq(i)
+            J(1, i) = (FK_with_deltaq(1,3) - FK_q(1,3)) / delta_q;  // dy / dq(i)
+            J(2, i) = (FK_with_deltaq(2,3) - FK_q(2,3)) / delta_q;  // dz / dq(i)
+        }
+        auto dg = -diff_pos.transpose()*J;
+        std::vector<double> temp;
+        for (int i=0; i<7; i++)
+        {
+            temp.push_back(dg[i]);
+        }
+        g_jac.push_back(temp);
+
+
+        // autodiff::VectorXreal x_autodiff = Eigen::Map<Eigen::Matrix<double, 7, 1> >(x.data()+idx*7, 7);
+
+        // autodiff::real g_autodiff;
+        // Eigen::VectorXd gradient = autodiff::gradient(ComputePointToPointDistanceConstraint, wrt(x_autodiff), at(x_autodiff, _object_pos), g_autodiff);
+        // g(idx) = g_autodiff.val();        
+        // g_jac.push_back(std::vector<double>(gradient.data(), gradient.data()+gradient.rows()));
+
         // std::cout << temp << std::endl;
         // std::cout << "g(idx) = " << g(idx) << std::endl;
-
-
-        // Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*7, 7);
-        // auto FK_q = Kinematics::ForwardKinematics(q, true);
-        // Eigen::VectorXd pos_t(3);
-        // pos_t << FK_q(0,3), FK_q(1,3), FK_q(2,3);
-        // auto diff_pos = pos_t - _object_pos;
-        // // std::cout << "Diff_pos: \n" << diff_pos << std::endl;
-        // double l2_norm = sqrt(diff_pos.transpose() * diff_pos);
-        // g(idx) = l2_norm;
-        // std::cout << "gradient: \n" << gradient.transpose() << std::endl;
     }
     // std::cout << "G = \n" << g << std::endl;
     return g;
@@ -58,7 +75,7 @@ AddPointToPointDistanceConstraint::VecBound AddPointToPointDistanceConstraint::G
     VecBound bounds(GetRows());
     for (auto &b : bounds)
     {
-        b = ifopt::Bounds(_tolerance, ifopt::inf);
+        b = ifopt::Bounds(0.0, ifopt::inf);
     }
     return bounds;
 }
