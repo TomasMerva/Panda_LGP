@@ -5,15 +5,13 @@
 #include <Eigen/Dense>
 #include <panda_motion_planning/utils/panda_kinematics.h>
 
-#include <autodiff/forward/real.hpp>
-#include <autodiff/forward/real/eigen.hpp>
 
 typedef struct {
-    int idx = 0;
+    size_t idx;
     double obj_pos_x;
     double obj_pos_y;
     double obj_pos_z;
-    double tolerance = 0.1;
+    double tolerance;
 } AddPointToPointDistanceData;
 
 namespace Constraint
@@ -22,9 +20,3 @@ namespace Constraint
     
 }
 
-namespace ConstraintTools
-{
-    autodiff::MatrixXreal DH_matrix(const autodiff::real a, const autodiff::real d, 
-                                    const autodiff::real alpha, const autodiff::real theta);
-    autodiff::real ComputePointToPointDistanceConstraint (autodiff::VectorXreal q, autodiff::VectorXreal obj_position);     
-}

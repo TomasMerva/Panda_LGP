@@ -53,6 +53,7 @@ add_library(komo_lib SHARED
   src/objective/komo_k2.cpp
   # constraints
   src/constraints/add_point_to_point_distance.cpp
+  src/constraints/add_fixed_orientation_axis.cpp
   # utils
   src/utils/motion_planning_tools.cpp
   src/utils/panda_kinematics.cpp
@@ -87,7 +88,16 @@ target_link_libraries(komo
                       autodiff::autodiff
                       )
 
-
+add_executable(test_nlopt src/test_nlopt.cpp)
+target_link_libraries(test_nlopt
+                      komo_lib
+                      "/usr/local/lib/libnlopt.so"
+                      gnuplot_module
+                      ${catkin_LIBRARIES}
+                      ${Boost_LIBRARIES}
+                      autodiff::autodiff
+                      )
+                      
 
 
 # add_executable(panda_motion_planning src/test.cpp )

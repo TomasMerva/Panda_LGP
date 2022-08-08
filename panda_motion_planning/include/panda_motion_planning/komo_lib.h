@@ -4,13 +4,14 @@
 #include <vector>
 #include <chrono>   // for measuring time
 #include <memory>   // unique_ptr
+#include <iomanip>
+
 
 #include <nlopt.hpp>
 #include <panda_motion_planning/variables/joints.h>
 #include <panda_motion_planning/objective/komo_k2.h>
 #include <panda_motion_planning/utils/motion_planning_tools.h>
-#include <panda_motion_planning/constraints/add_point_to_point_distance.h>
-
+#include <panda_motion_planning/constraints/constraints_list.h>
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
@@ -18,19 +19,10 @@ using std::chrono::duration;
 using std::chrono::milliseconds;
 
 enum FeatureSymbol{
-    FS_none = -1,
-    FS_PointToPointDistance
+    FS_none = 0,
+    FS_PointToPointDistance = 1,
+    FS_FixedOrientationAxis = 2, 
 };
-
-
-typedef struct
-{
-    double obj_x = 0.6;
-    double obj_y = 0.0;
-    double obj_z = 0.1;
-    double dist_tol = 0.05;
-} constraint_data;
-
 
 
 // TODO: k-order is not implemented, it is always k_order = 2
@@ -47,7 +39,7 @@ class KOMO : public MotionPlanningTools
 
         // TODO: add time step range
         void AddConstraint(FeatureSymbol);
-        void ClearConstraint();
+        void ClearConstraints();
 
 
     private:

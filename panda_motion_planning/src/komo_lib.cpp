@@ -1,8 +1,8 @@
 #include <panda_motion_planning/komo_lib.h>
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::KOMO Setting sizes of variables
-/// \param
+/// @brief KOMO::KOMO Setting sizes of variables
+/// @param
 ///////////////////////////////////////////////////////////////////////
 KOMO::KOMO(ros::NodeHandle &nh, const int num_joints, const int num_time_slices, const int k_order)
     : _num_joints(num_joints)
@@ -14,8 +14,8 @@ KOMO::KOMO(ros::NodeHandle &nh, const int num_joints, const int num_time_slices,
 
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::UpdateStates Update the start and goal state
-/// \param
+/// @brief KOMO::UpdateStates Update the start and goal state
+/// @param
 ///////////////////////////////////////////////////////////////////////
 void KOMO::UpdateStates(const std::vector<double> new_start_state, const std::vector<double> new_goal_state)
 {
@@ -24,8 +24,8 @@ void KOMO::UpdateStates(const std::vector<double> new_start_state, const std::ve
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::Optimize() Construct NLP and use AUGLAG solver to find an optimum
-/// \param 
+/// @brief KOMO::Optimize() Construct NLP and use AUGLAG solver to find an optimum
+/// @param 
 ///////////////////////////////////////////////////////////////////////
 std::vector<std::vector<double>> KOMO::Optimize()
 {
@@ -54,109 +54,49 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
 
     // 4. set constraints
-    AddPointToPointDistanceData constraint_data[20];
     std::vector<nlopt::vfunc> nlopt_constraints;
-
-    for(size_t i =0; i< _num_time_slices; i++)
-    {
-        nlopt_constraints.push_back([](const std::vector<double>& x, std::vector<double>& grad, void* data) -> double {
-            AddPointToPointDistanceData *d = reinterpret_cast<AddPointToPointDistanceData*>(data);
-            int num_variables = 7;
-            int idx = d->idx; 
-            Eigen::VectorXd obj_pos(3);
-            obj_pos << d->obj_pos_x, d->obj_pos_y, d->obj_pos_z;
-            double tolerance = d->tolerance;
-            double delta_q = 0.001;
-
-            Eigen::VectorXd q = Eigen::Map<const Eigen::VectorXd>(x.data()+idx*num_variables, num_variables);
-
-            auto FK_q = Kinematics::ForwardKinematics(q, true);
-            Eigen::VectorXd pos_t(3);
-            pos_t << FK_q(0,3), FK_q(1,3), FK_q(2,3);
-            auto diff_pos = obj_pos - pos_t;
-            double l2_norm = - sqrt((diff_pos.transpose()*diff_pos)[0]) + 0.3;
-
-            if (!grad.empty())
-            {
-                std::fill(grad.begin(), grad.end(), 0);
-                Eigen::MatrixXd J(3, num_variables);
-                for (int i=0; i<num_variables; i++)
-                {
-                    auto temp = q;
-                    temp(i) += delta_q; // ad delta_q to the q(i)
-                    auto FK_with_deltaq = Kinematics::ForwardKinematics(temp, true); //compute FK with q(i)+delta_q
-                    J(0, i) = (FK_with_deltaq(0,3) - FK_q(0,3)) / delta_q;  // dx / dq(i)
-                    J(1, i) = (FK_with_deltaq(1,3) - FK_q(1,3)) / delta_q;  // dy / dq(i)
-                    J(2, i) = (FK_with_deltaq(2,3) - FK_q(2,3)) / delta_q;  // dz / dq(i)
-                }
-                auto dg = diff_pos.transpose()*J;
-                for (int i=0; i<num_variables; i++)
-                {
-                    grad[i + idx*num_variables] = dg[i];
-                }
-                
-            }
-            return l2_norm;
-        });
-    }
-
     const double kTolerance = 1e-4;
-    for (int i=0; i<_num_time_slices; i++)
+    std::vector<AddPointToPointDistanceData> APTPD_constraint_data(_num_time_slices);
+    std::vector<AddFixedOrientationAxisData> AFOA_constraint_data(_num_time_slices);
+
+    for (auto g : _constraint_list)
     {
-        constraint_data[i] = {i, 0.5, 0.0, 0.1, 0.3};
-        opt.add_inequality_constraint(nlopt_constraints[i], &constraint_data[i], kTolerance);
+        std::cout << "g is: " << g << "\n";
+        if (g == FS_none)
+        {
+            opt.remove_equality_constraints();
+            opt.remove_inequality_constraints(); 
+        }
+        else if (g == FS_PointToPointDistance)
+        {
+            for (size_t idx = 0; idx<_num_time_slices; idx++)
+            {
+                APTPD_constraint_data[idx] = {idx, 0.5, 0.0, 0.1, 0.3};
+                opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &APTPD_constraint_data[idx], kTolerance);
+            }
+        }
+        else if( g == FS_FixedOrientationAxis)
+        {
+            auto FK_q = Kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(_start_state.data(), _num_joints), true);
+            for (size_t idx=0; idx<_num_time_slices; idx++)
+            {
+                AFOA_constraint_data[idx] = {idx, 0, FK_q(0,0), FK_q(1,0), FK_q(2,0)};
+                opt.add_equality_constraint(Constraint::AddFixedOrientationAxis, &AFOA_constraint_data[idx], kTolerance);
+            }
+        }
     }
 
-
-    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[0], 1e-10);
-    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[1], 1e-10);
-    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[2], 1e-10);
-    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[3], 1e-10);
-    // opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[4], 1e-10);
-
-
-    // AddPointToPointDistanceData constraint_data[_num_time_slices];
-    // for (int timestep=1; timestep < (_num_time_slices-1); timestep++)
-    // {
-    //     constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.1, 0.3};
-    //     opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-10);
-    // }
     
-    // opt.set_ftol_abs(1e-6);
-    // opt.set_ftol_rel(1e-6);
-    // std::cout << opt.get_ftol_abs() << " " << opt.get_ftol_rel() << std::endl; 
-    
-    // for (auto g : _constraint_list)
-    // {
-    //     switch (g)
-    //     {
-    //         case FS_none:
-    //             break;
-            
-    //         case FS_PointToPointDistance:
-    //             for (int timestep=1; timestep < (_num_time_slices-1); timestep++)
-    //             {
-    //                 constraint_data[timestep-1] = {timestep, 0.5, 0.0, 0.125, 0.5};
-    //                 opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &constraint_data[timestep-1], 1e-8);
-    //             }
-    //             break;
-
-    //         default:
-    //             break;
-    //     }
-    // }
-
-    
-
     // 5. set an initial guess
     std::vector<double> q = x->InitialGuess(_start_state, _goal_state);
 
     // 6. optimize
     double min_obj_value;
     auto start_time = high_resolution_clock::now();
+    nlopt::result result;
     try
     {
-        nlopt::result result = opt.optimize(q, min_obj_value);
+        result = opt.optimize(q, min_obj_value);
         auto finish_time = high_resolution_clock::now();
         std::cout << "------------------------------------------\n";
         duration<double, std::milli> ms_double = finish_time - start_time;
@@ -189,27 +129,6 @@ std::vector<std::vector<double>> KOMO::Optimize()
                 std::cout << "NLOPT status: Optimization stopped because `maxtime` was reached.\n";
                 std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
                 break;
-            // Negative messages
-            // case -1:
-            //     std::cout << "NLOPT status: Generic failure code.\n";
-            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n"; 
-            //     break;
-            // case -2:
-            //     std::cout << "NLOPT status: Invalid arguments (e.g. lower bounds are bigger than upper bounds, an unknown algorithm was specified, etcetera).\n";
-            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
-            //     break;
-            // case -3:
-            //     std::cout << "NLOPT status: Ran out of memory.\n";
-            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
-            //     break;
-            // case -4:
-            //     std::cout << "NLOPT status: Halted because roundoff errors limited progress. (In this case, the optimization still typically returns a useful result.)\n";
-            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
-            //     break;
-            // case -5:
-            //     std::cout << "NLOPT status: Halted because of a forced termination: The user called a stop function\n";
-            //     std::cout << "EXIT: Optimal Solution cannot be found.\n--------\n";
-            //     break;
             default:
                 break;
         }       
@@ -219,40 +138,44 @@ std::vector<std::vector<double>> KOMO::Optimize()
         std::cout << "nlopt failed: " << e.what() << std::endl;         
     }
 
-    // TODO : ADD success termination
-
-
-    // --------------
-    // Return results
-    std::vector<std::vector<double>> q_time_steps;
-    size_t idx=0;
-    for (int col=0; col<_num_time_slices; col++)
+    // 7. Return results
+    if (result > 0) // Found a solution
     {
-        std::vector<double> temp;
-        for (int row=0; row<_num_joints; row++)
+        std::vector<std::vector<double>> q_time_steps;
+        size_t idx=0;
+        for (int col=0; col<_num_time_slices; col++)
         {
-            temp.push_back(q[idx]);
-            idx++;
+            std::vector<double> temp;
+            for (int row=0; row<_num_joints; row++)
+            {
+                temp.push_back(q[idx]);
+                idx++;
+            }
+            q_time_steps.push_back(temp);
         }
-        q_time_steps.push_back(temp);
+        std::vector<double> q1, q2, q3, q4, q5, q6, q7;
+        for (int i=0; i<_num_time_slices; i++)
+        {
+            q1.push_back(q_time_steps[i][0]);
+            q2.push_back(q_time_steps[i][1]);
+            q3.push_back(q_time_steps[i][2]);
+            q4.push_back(q_time_steps[i][3]);
+            q5.push_back(q_time_steps[i][4]);
+            q6.push_back(q_time_steps[i][5]);
+            q7.push_back(q_time_steps[i][6]);
+        }
+        return std::vector<std::vector<double>>{q1, q2, q3, q4, q5, q6, q7};
     }
-    std::vector<double> q1, q2, q3, q4, q5, q6, q7;
-    for (int i=0; i<_num_time_slices; i++)
+    else    // Failed to find a solution
     {
-        q1.push_back(q_time_steps[i][0]);
-        q2.push_back(q_time_steps[i][1]);
-        q3.push_back(q_time_steps[i][2]);
-        q4.push_back(q_time_steps[i][3]);
-        q5.push_back(q_time_steps[i][4]);
-        q6.push_back(q_time_steps[i][5]);
-        q7.push_back(q_time_steps[i][6]);
+        return std::vector<std::vector<double>>{_start_state};
     }
-    return std::vector<std::vector<double>>{q1, q2, q3, q4, q5, q6, q7};
+    
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::GetJointLimits Return the set joint limits
-/// \param 
+/// @brief KOMO::GetJointLimits Return the set joint limits
+/// @param 
 ///////////////////////////////////////////////////////////////////////
 std::vector<std::pair<double, double>> KOMO::GetJointLimits()
 {
@@ -269,8 +192,8 @@ std::vector<std::pair<double, double>> KOMO::GetJointLimits()
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::AddObjective Add kinematic constraint
-/// \param 
+/// @brief KOMO::AddObjective Add kinematic constraint
+/// @param 
 ///////////////////////////////////////////////////////////////////////
 void KOMO::AddConstraint(FeatureSymbol FS)
 {
@@ -278,10 +201,10 @@ void KOMO::AddConstraint(FeatureSymbol FS)
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// \brief KOMO::ClearObjectives Delete all constraints
-/// \param 
+/// @brief KOMO::ClearObjectives Delete all constraints
+/// @param 
 ///////////////////////////////////////////////////////////////////////
-void KOMO::ClearConstraint()
+void KOMO::ClearConstraints()
 {
     _constraint_list.clear();   
 }
