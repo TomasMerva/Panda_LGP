@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<launch>
+  <node name="pose_sliders_publisher" pkg="pose_sliders_publisher" type="pose_sliders_publisher" output="screen"/>
+</launch>
