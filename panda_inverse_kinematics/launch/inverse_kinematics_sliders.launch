@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<launch>
+  <node name="inverse_kinematics" pkg="panda_inverse_kinematics" type="inverse_kinematics" output="screen"/>
+
+  <node name="pose_sliders_publisher" pkg="pose_sliders_publisher" type="pose_sliders_publisher" output="screen"/>
+
+</launch>
