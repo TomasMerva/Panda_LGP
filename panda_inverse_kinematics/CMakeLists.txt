@@ -38,6 +38,15 @@ include_directories("/usr/local/include/gnuplot_module")
 
 add_library(ik_lib SHARED
   src/inverse_kinematics.cpp
+  # decision variables
+  src/variables/joints.cpp
+  # costs
+  src/costs/quadratic_error_cost.cpp
+  # constraints
+  src/constraints/position_constraint.cpp
+  # utils
+  src/utils/motion_planning_tools.cpp
+  src/utils/panda_kinematics.cpp
 )
 target_link_libraries(ik_lib ${catkin_LIBRARIES})
 

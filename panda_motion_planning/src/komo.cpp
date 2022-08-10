@@ -10,7 +10,10 @@ std::vector<double> q_start(7);
 
 void JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
 {
-    q_start = msg->position;
+    for (int idx=0; idx<7; idx++)
+    {
+        q_start[idx] = msg->position[idx];
+    }
 }
 
 int main(int argc, char **argv)

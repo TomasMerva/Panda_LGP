@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     {
         if(visualize_arg == "true")
         {
-            komo.VisualizeTrajectory(results, true);;
+            komo.VisualizeTrajectory(results, true);
         }
         std::string answer;
         std::cout << "Do you want to execute?";
