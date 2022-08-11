@@ -9,7 +9,6 @@
 #include <gnuplot_module/gnuplot_module.h>
 
 std::vector<double> q_start(7);
-std::vector<double> pose_goal(6);
 ros::Publisher joint_pub;
 
 void JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
@@ -22,12 +21,11 @@ void JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
 
 void SlidersCallback(const std_msgs::Float64MultiArrayConstPtr& msg)
 {
-    memcpy(&pose_goal[0], &msg->data[0], sizeof(msg->data));
-    std::vector<double> translation{pose_goal[0], pose_goal[1], pose_goal[2]};
+    std::vector<double> translation{msg->data[0], msg->data[1], msg->data[2]};
+    std::vector<double> rotation{msg->data[3], msg->data[4], msg->data[5]};
     InverseKinematics ik;
     ik.AddPositionConstraint(translation);
-    // ik.AddConstraint(FS_PositionConstraint);
-    //ik.AddOrientationConstraint()
+    ik.AddOrientationConstraint(rotation);
     ik.SetInitialGuess(q_start);
     auto results = ik.Solve();
     ROS_INFO("IK Success...");

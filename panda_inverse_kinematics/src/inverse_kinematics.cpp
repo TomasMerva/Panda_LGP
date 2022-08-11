@@ -22,6 +22,12 @@ void InverseKinematics::AddPositionConstraint(std::vector<double> p_AQ_bounds)
     _p_AQ_bounds = p_AQ_bounds;
 }
 
+void InverseKinematics::AddOrientationConstraint(std::vector<double> rpy)
+{
+    _rpy = rpy;
+}
+
+
 std::vector<double> InverseKinematics::Solve()
 {
     // 1. define a problem
@@ -29,18 +35,22 @@ std::vector<double> InverseKinematics::Solve()
     nlp.AddVariableSet(std::make_unique<JointVariables>("x", _num_joints, _q_start));
     nlp.AddCostSet(std::make_unique<QuadraticErrorCost>("QuadraticErrorCost", _num_joints, _q_start));
     nlp.AddConstraintSet(std::make_unique<PositionConstraint>("PositionConstraint", _p_AQ_bounds, _p_AQ_bounds));
+    nlp.AddConstraintSet(std::make_unique<OrientationConstraint>("OrientationConstraint", _rpy, 0.01));
+
     nlp.PrintCurrent();
 
     // 2. choose solver and options
     ifopt::IpoptSolver ipopt;
     // ipopt.SetOption("linear_solver", "");
-    ipopt.SetOption("jacobian_approximation", "exact");
-    // ipopt.SetOption("jacobian_approximation", "finite-difference-values");
+    // ipopt.SetOption("jacobian_approximation", "exact");
+    ipopt.SetOption("jacobian_approximation", "finite-difference-values");
     ipopt.SetOption("hessian_approximation", "limited-memory");
     ipopt.SetOption("max_iter", 10000);
     ipopt.SetOption("tol", 1e-2);
     ipopt.SetOption("acceptable_tol", 1e-2);
-    ipopt.SetOption("nlp_scaling_max_gradient", 100.0);
+    ipopt.SetOption("constr_viol_tol", 1e-2);
+
+    // ipopt.SetOption("nlp_scaling_max_gradient", 100.0);
     // ipopt.SetOption("derivative_test", "first-order");
 
 

@@ -23,6 +23,8 @@ std::array<double, 7> InverseKinematics(std::array<double, 16> O_T_EE_array,
                                     double q7, std::array<double, 7> q_actual_array);
 
 
+// Rz*Ry*Rx 
+Eigen::Matrix3d RotationMatrixFromRPY(double roll, double pitch, double yaw);
 
 } //namespace panda_kinematics
 

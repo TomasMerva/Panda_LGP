@@ -55,6 +55,25 @@ Eigen::Matrix4d Kinematics::ForwardKinematics(Eigen::VectorXd q, bool gripper_en
 }
 
 
+Eigen::Matrix3d Kinematics::RotationMatrixFromRPY(double roll, double pitch, double yaw)
+{
+    Eigen::Matrix3d Rz;
+    Rz << cos(yaw),     -sin(yaw),     0,
+          sin(yaw),     cos(yaw),      0,
+          0,            0,             1;
+    Eigen::Matrix3d Ry;
+    Ry << cos(pitch),   0,   sin(pitch),
+          0,            1,   0,
+          -sin(pitch),  0,   cos(pitch);
+    Eigen::Matrix3d Rx;
+    Rx << 1,        0,             0,
+          0,        cos(roll),     -sin(roll),
+          0,        sin(roll),     cos(roll);
+
+    // return Rz*Ry*Rx;
+    return Rx*Ry*Rz;
+}
+
 
 
 

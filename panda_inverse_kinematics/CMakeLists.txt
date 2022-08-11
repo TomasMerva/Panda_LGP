@@ -44,6 +44,7 @@ add_library(ik_lib SHARED
   src/costs/quadratic_error_cost.cpp
   # constraints
   src/constraints/position_constraint.cpp
+  src/constraints/orientation_constraint.cpp
   # utils
   src/utils/motion_planning_tools.cpp
   src/utils/panda_kinematics.cpp
