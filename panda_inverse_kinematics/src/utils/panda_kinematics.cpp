@@ -69,9 +69,44 @@ Eigen::Matrix3d Kinematics::RotationMatrixFromRPY(double roll, double pitch, dou
     Rx << 1,        0,             0,
           0,        cos(roll),     -sin(roll),
           0,        sin(roll),     cos(roll);
+    return Rz*Ry*Rx;
 
-    // return Rz*Ry*Rx;
-    return Rx*Ry*Rz;
+    // double yaw = x;
+    // double pitch = y;
+    // double roll = z;
+
+    // Eigen::Matrix3d Rx_yaw;
+    // Rx_yaw <<  1,         0,           0,
+    //           0,         cos(yaw),    -sin(yaw),
+    //           0,         sin(yaw),    cos(yaw);
+              
+    // Eigen::Matrix3d Ry_pitch;
+    // Ry_pitch <<  cos(pitch),      0,       sin(pitch),
+    //             0,               1,       0,
+    //             -sin(pitch),     0,       cos(pitch);
+    
+    // Eigen::Matrix3d Rz_roll;
+    // Rz_roll <<  cos(roll),  -sin(roll),     0,
+    //            sin(roll),  cos(roll),      0,
+    //            0,          0,              1;
+
+    // return Rz_roll*Ry_pitch*Rx_yaw;
+}
+
+Eigen::Vector3d Kinematics::RPYFromRotationMatrix(const Eigen::Matrix3d R)
+{
+    Eigen::Vector3d RPY;
+    RPY(0) = atan2(R(2,1),R(2,2));
+    RPY(2) = atan2(R(1,0),R(0,0));
+    if (cos(RPY(1)) == 0)
+    {
+        RPY(1) = atan2(-R(2,0), R(1,0)/sin(RPY(2)));
+    }
+    else
+    {
+        RPY(1) = atan2(-R(2,0), R(0,0)/cos(RPY(2)));
+    }
+    return RPY;
 }
 
 

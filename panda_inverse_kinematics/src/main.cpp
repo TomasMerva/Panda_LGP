@@ -44,6 +44,13 @@ void SlidersCallback(const std_msgs::Float64MultiArrayConstPtr& msg)
     joint_msg.joint_position[5] = results[5];
     joint_msg.joint_position[6] = results[6];
     joint_pub.publish(joint_msg);  
+
+    Eigen::VectorXd temp = Eigen::Map<Eigen::VectorXd>(&results[0], results.size());
+    auto FK = Kinematics::ForwardKinematics(temp, true);
+    Eigen::MatrixXd R = FK.block<3,3>(0,0); 
+    auto rpy = Kinematics::RPYFromRotationMatrix(R);
+    std::cout << "RPY: \t " << rpy.transpose() << std::endl;
+
     }
 
 
