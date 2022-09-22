@@ -13,9 +13,11 @@
 panda_lgp 
     - include
     - src
-        - constraints -> Position, Orientation, Distance, Grasp, ...
-        - KOMO -> objective function, funkcie na pridanie constraints, urcenie pre ktoru fazu patria dane constraints, NLOPT/IFOPT bridge
         - utils -> DH matrices, geometric Jacobian, FK, marker visualization, ...
+        - KOMO -> objective function, funkcie na pridanie constraints, urcenie pre ktoru fazu patria dane constraints, NLOPT/IFOPT bridge
+
+
+        - constraints -> Position, Orientation, Distance, Grasp, ...
         - action_skeleton -> define actions
         - main.cpp:
             1. Hand write the action sequence (simple array with names maybe) -> not very important without TP
@@ -26,6 +28,10 @@ panda_lgp
             6. Execute the whole plan
         
         - Logic -> TODO: not important for now, logic expressions, FoL, maybe tree
+
+TODO:
+    1. MotionROSTools::VisualizeTrajectory -> I do not like vector of vectors as an argument
+    2. Same for MotionROSTools::ExecuteTrajectory
 
 
 

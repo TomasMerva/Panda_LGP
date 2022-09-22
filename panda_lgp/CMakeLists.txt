@@ -42,6 +42,7 @@ include_directories("/usr/local/include/gnuplot_module")
 add_library(lgp_lib SHARED
   # utils
   src/utils/kinematics.cpp
+  src/utils/motion_ros_tools.cpp
 )
 target_link_libraries(lgp_lib 
                       "/usr/local/lib/libnlopt.so"
