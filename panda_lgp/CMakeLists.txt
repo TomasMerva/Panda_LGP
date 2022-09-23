@@ -40,6 +40,8 @@ include_directories("/usr/local/include")
 include_directories("/usr/local/include/gnuplot_module")
 
 add_library(lgp_lib SHARED
+  # KOMO framework
+  src/KOMO/komo.cpp
   # utils
   src/utils/kinematics.cpp
   src/utils/motion_ros_tools.cpp

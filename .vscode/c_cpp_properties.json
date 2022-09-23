@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/tomas/catkin_ws/devel_isolated/panda_gazebo_controllers/include/**",
+        "/home/tomas/catkin_ws/devel_isolated/gnuplot_module/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/tomas/catkin_ws/src/eigen_testy/include/**",
+        "/home/tomas/catkin_ws/src/ifopt_test/include/**",
+        "/home/tomas/catkin_ws/src/Panda_LGP/panda_gazebo_controllers/include/**",
+        "/home/tomas/catkin_ws/src/Panda_LGP/panda_inverse_kinematics/include/**",
+        "/home/tomas/catkin_ws/src/Panda_LGP/panda_komo_ipopt/include/**",
+        "/home/tomas/catkin_ws/src/Panda_LGP/panda_lgp/include/**",
+        "/home/tomas/catkin_ws/src/Panda_LGP/panda_motion_planning/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
