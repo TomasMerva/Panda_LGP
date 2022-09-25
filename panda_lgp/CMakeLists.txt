@@ -40,6 +40,10 @@ include_directories("/usr/local/include")
 include_directories("/usr/local/include/gnuplot_module")
 
 add_library(lgp_lib SHARED
+  # constraints
+
+  # Logic
+  src/logic/operators.cpp
   # KOMO framework
   src/KOMO/komo.cpp
   # utils

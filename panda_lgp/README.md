@@ -33,11 +33,13 @@ panda_lgp
 TODO:
     1. MotionROSTools::VisualizeTrajectory -> I do not like vector of vectors as an argument
     2. Same for MotionROSTools::ExecuteTrajectory
+    
     3. kinematics::Configuration -> add other variables. I do not know what is useful so far, maybe frames, etc.
     4. How to extend the dimension of decision variables?
     5. I added decision variables for each phase, not sure if its the best idea
     6. KOMO::SetModel() -> have not idea how to make it general
     7. KOMO::Optimize() -> either differentiate between 2. level or 3. level(by using an argument) or make it general and create separate function that would prepare KOMO for the second level
+        <!-- -> I suggest to use SetModel() to set _model_variable for KOMO (set number of decision variables, boundaries) -->
 
 
 
