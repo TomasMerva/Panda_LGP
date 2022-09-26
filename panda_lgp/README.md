@@ -40,9 +40,15 @@ TODO:
     6. KOMO::SetModel() -> have not idea how to make it general
     7. KOMO::Optimize() -> either differentiate between 2. level or 3. level(by using an argument) or make it general and create separate function that would prepare KOMO for the second level
         <!-- -> I suggest to use SetModel() to set _model_variable for KOMO (set number of decision variables, boundaries) -->
+    8. Operators are only for simple problem pick&place
 
 
-
+My idea:
+    1. Define skeleton as a vector of SkeletonEntry
+        1.1. SkeletonEntry -> structure in which you define name of the action and the frames that it concerns
+    2. Thereafter I will call a function that transforms the skeleton vector to:
+        2.1. It should "translate" the Skeleton vector into separate phases with the continuous values (based on the names of the frames) -> basically from Enum and strings to phases structures with exact continous values (maybe separate structure/class for each action)
+    3. Convert these actions into phases so it can be solved with a NLP solver
 
 
 

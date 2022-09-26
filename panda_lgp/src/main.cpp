@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
     for (auto SE : S.operators)
     {
-        std::cout << "";
+        std::cout << SE.action_name << std::endl;
     }    
 
     return 0;

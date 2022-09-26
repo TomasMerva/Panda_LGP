@@ -8,7 +8,7 @@ KOMO::KOMO(ros::NodeHandle &nh, const int num_joints, const int num_time_slices,
     : _num_joints(num_joints)
     , _num_time_slices(num_time_slices)
     , MotionPlanningTools(nh)
-{    
+{
     _init_start_guess = {0, -0.785398163, 0, -2.35619449, 0, 1.57079632679, 0.785398163397};
 }
 
@@ -25,12 +25,12 @@ void KOMO::UpdateStates(const std::vector<double> new_start_state, const std::ve
 
 ///////////////////////////////////////////////////////////////////////
 /// @brief KOMO::Optimize() Construct NLP and use AUGLAG solver to find an optimum
-/// @param 
+/// @param
 ///////////////////////////////////////////////////////////////////////
 std::vector<std::vector<double>> KOMO::Optimize()
 {
     std::unique_ptr<JointsVariable> x = std::make_unique<JointsVariable>(_num_joints, _num_time_slices);
-    std::unique_ptr<KOMO_k2> objective = std::make_unique<KOMO_k2>(_num_joints, _num_time_slices); 
+    std::unique_ptr<KOMO_k2> objective = std::make_unique<KOMO_k2>(_num_joints, _num_time_slices);
 
     // 1. choose solvers
     // nlopt::algorithm::LD_AUGLAG_EQ AUGLAG
@@ -43,7 +43,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
     opt.set_local_optimizer(local_opt);
     opt.set_maxtime(60);
     opt.set_xtol_abs(0.0001);
-    
+
     // 2. set bounds
     x->SetBoundaryConstraints(_start_state, _goal_state);
     opt.set_lower_bounds(x->GetLowerBounds());
@@ -51,7 +51,6 @@ std::vector<std::vector<double>> KOMO::Optimize()
 
     // 3. set an objective function
     opt.set_min_objective(objective->GetCost, NULL);
-
 
     // 4. set constraints
     std::vector<nlopt::vfunc> nlopt_constraints;
@@ -65,7 +64,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
         if (g == FS_none)
         {
             opt.remove_equality_constraints();
-            opt.remove_inequality_constraints(); 
+            opt.remove_inequality_constraints();
         }
         else if (g == FS_PointToPointDistance)
         {
@@ -86,7 +85,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
         }
     }
 
-    
+
     // 5. set an initial guess
     std::vector<double> q = x->InitialGuess(_start_state, _goal_state);
 
@@ -101,41 +100,41 @@ std::vector<std::vector<double>> KOMO::Optimize()
         std::cout << "------------------------------------------\n";
         duration<double, std::milli> ms_double = finish_time - start_time;
         std::cout << "Number of iterations: \t=\t" << objective->num_iterations << "\n";
-        std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n"; 
+        std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
         switch (result)
         {
             // Positive messages
             case 1:
                 std::cout << "NLOPT status: Generic success return value.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             case 2:
                 std::cout << "NLOPT status: Optimization stopped because `stopval` was reached.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             case 3:
                 std::cout << "NLOPT status: Optimization stopped because `ftol_rel` or `ftol_abs` was reached.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             case 4:
                 std::cout << "NLOPT status: Optimization stopped because `xtol_rel` or `xtol_abs` was reached.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             case 5:
                 std::cout << "NLOPT status: Optimization stopped because `maxeval` was reached.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             case 6:
                 std::cout << "NLOPT status: Optimization stopped because `maxtime` was reached.\n";
-                std::cout << "EXIT: Optimal Solution Found.\n--------\n"; 
+                std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                 break;
             default:
                 break;
-        }       
+        }
     }
-    catch(std::exception &e) 
+    catch(std::exception &e)
     {
-        std::cout << "nlopt failed: " << e.what() << std::endl;         
+        std::cout << "nlopt failed: " << e.what() << std::endl;
     }
 
     // 7. Return results
@@ -170,12 +169,12 @@ std::vector<std::vector<double>> KOMO::Optimize()
     {
         return std::vector<std::vector<double>>{_start_state};
     }
-    
+
 }
 
 ///////////////////////////////////////////////////////////////////////
 /// @brief KOMO::GetJointLimits Return the set joint limits
-/// @param 
+/// @param
 ///////////////////////////////////////////////////////////////////////
 std::vector<std::pair<double, double>> KOMO::GetJointLimits()
 {
@@ -193,7 +192,7 @@ std::vector<std::pair<double, double>> KOMO::GetJointLimits()
 
 ///////////////////////////////////////////////////////////////////////
 /// @brief KOMO::AddObjective Add kinematic constraint
-/// @param 
+/// @param
 ///////////////////////////////////////////////////////////////////////
 void KOMO::AddConstraint(FeatureSymbol FS)
 {
@@ -202,9 +201,9 @@ void KOMO::AddConstraint(FeatureSymbol FS)
 
 ///////////////////////////////////////////////////////////////////////
 /// @brief KOMO::ClearObjectives Delete all constraints
-/// @param 
+/// @param
 ///////////////////////////////////////////////////////////////////////
 void KOMO::ClearConstraints()
 {
-    _constraint_list.clear();   
+    _constraint_list.clear();
 }
