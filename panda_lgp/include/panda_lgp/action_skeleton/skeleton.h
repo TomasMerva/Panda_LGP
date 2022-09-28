@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Eigen/Dense>
 #include <vector>
 #include <string>
 #include <panda_lgp/action_skeleton/operators.h>
@@ -31,7 +32,9 @@ class Skeleton
         // TODO: it is not general!!!
         std::vector<double> _grey_region = std::vector<double>(2);
         std::vector<double> _red_region = std::vector<double>(2);
-        std::vector<double> _cube_position = std::vector<double>(3);
+        //std::vector<double> _cube_position = std::vector<double>(3);
+        Eigen::Matrix4d _cube_frame;
+        std::vector<double> _cube_pos;  //TODO: delete
         // TODO: maybe add actual pose of the robot? or maybe read it from KOMO
   
 };

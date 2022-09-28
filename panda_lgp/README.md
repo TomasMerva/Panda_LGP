@@ -55,3 +55,11 @@ My idea:
 1. Potrebujem dajak priradit nazov framu, ku danemu objektu? Alebo presnejsie musim vediet, ze o ktory objekt sa jedna na zaklade nazvu
 2. Ked budem mat toto tak potom by som mal vediet vyjadrit constraints
 - teoreticky to viem urobit naopak, vyjadrit constraints a hodnoty dat na zaklade nazvov
+3. Vedel by som ukladat smerniky na funkciu pre constraints s tym, ze menili by sa iba Data -> cize zrobit nejaku general strukturu pre constraints
+Problem je ze sa mi mozno menia dimenzia decision variables ale asi srat na to
+
+Co mam zatial:
+    1. priradenu geometricku constraint pre phase
+    2. priradene data pre constraint
+    3. boundaries for decision variables
+    4. Init state potrebujem dat

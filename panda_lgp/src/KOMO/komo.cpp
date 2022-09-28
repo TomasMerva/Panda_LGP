@@ -87,21 +87,21 @@ void KOMO::SetTiming(const double num_phases, const double num_time_slices,
 {
     for (uint i = 0; i<num_phases; ++i)
     {
-        phases.push_back(Phase{i, "pick" , num_time_slices, std::vector<FeatureSymbol>{FeatureSymbol::FS_none}});
+        // phases.push_back(Phase{i, "pick" , num_time_slices, std::vector<ConstraintSymbol>{ConstraintSymbol::FS_none}});
     }
 }
 
 ///////////////////////////////////////////////////////////////////////
 /// @brief Add constraints to the phases based on given ID
 /// @param phases_ID Vector of phases' ID
-/// @param FeatureSymbol Enum for different constraints
+/// @param ConstraintSymbol Enum for different constraints
 ///////////////////////////////////////////////////////////////////////
-void KOMO::AddConstraint(const std::vector<uint> phases_ID, FeatureSymbol g)
+void KOMO::AddConstraint(const std::vector<uint> phases_ID, Constraint::ConstraintSymbol g)
 {
     for (auto id : phases_ID)
     {
-        if (phases[id].constraints[0] == FeatureSymbol::FS_none ) phases[id].constraints.clear();
-        phases[id].constraints.push_back(g);
+        // if (phases[id].constraints[0] == ConstraintSymbol::FS_none ) phases[id].constraints.clear();
+        // phases[id].constraints.push_back(g);
     }
 }
 
@@ -114,7 +114,7 @@ void KOMO::ClearConstraint(const std::vector<uint> phases_ID)
     for (auto id : phases_ID)
     {
         phases[id].constraints.clear();
-        phases[id].constraints.push_back(FeatureSymbol::FS_none);
+        // phases[id].constraints.push_back(ConstraintSymbol::FS_none);
     }
 }
 
@@ -134,15 +134,42 @@ void KOMO::Reset()
 ///////////////////////////////////////////////////////////////////////
 KomoStatus KOMO::Optimize(LgpLevel level)
 {
-    // 1. Choose solver and set decision variables
-    nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, _NLP_model.x_dim);
-    nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, _NLP_model.x_dim);
-    opt.set_xtol_abs(1e-6);
-    opt.set_local_optimizer(local_opt);
+    if (level == LgpLevel::SECOND_LEVEL)
+    {
+        uint x_dim = 7 + 3; //q(7) + cube[x,y,z]
 
-    // 2. Set boundaries
-    opt.set_lower_bounds(_NLP_model.lower_bounds);
-    opt.set_upper_bounds(_NLP_model.upper_bounds);
+        // 1. Choose solver and set decision variables
+        nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, phases.size()*x_dim);
+        nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_dim);
+        opt.set_xtol_abs(1e-6);
+        opt.set_local_optimizer(local_opt);
+
+        // 2. Set boundaries
+        // - convert boundaries from all phases into one vector
+        std::vector<double> lower_bounds;
+        std::vector<double> upper_bounds;
+        for (auto phase : phases)
+        {
+            lower_bounds.insert(lower_bounds.begin(), phase.lower_bounds.begin(), phase.lower_bounds.end());
+            upper_bounds.insert(upper_bounds.begin(), phase.upper_bounds.begin(), phase.upper_bounds.end());
+        }
+        opt.set_lower_bounds(lower_bounds);
+        opt.set_upper_bounds(upper_bounds);
+
+        // 3. Set objective function
+        // TODO: I have to express Jacobian automatically based on the number of variables (find a pattern)
+
+
+    }
+    else if(level == LgpLevel::THIRD_LEVEL)
+    {
+
+    }
+    else
+    {}
+    
+
+    
 
     // 3. Set objective
 
@@ -167,4 +194,30 @@ KomoStatus KOMO::Optimize(LgpLevel level)
     // }
     // else
     // {}
+}
+
+
+void KOMO::AddJointLimits(std::vector<double> &lower_bounds, std::vector<double> &upper_bounds)
+{
+    // q1
+    lower_bounds[0] = -2.8973;
+    upper_bounds[0] = 2.8973;
+    // q2
+    lower_bounds[1] = -1.7628;
+    upper_bounds[1] = 1.7628;
+    // q3
+    lower_bounds[2] = -2.8973;
+    upper_bounds[2] = 2.8973;
+    // q4
+    lower_bounds[3] = -3.0718;
+    upper_bounds[3] = -0.0698;
+    // q5
+    lower_bounds[4] = -2.8973;
+    upper_bounds[4] = 2.8973;
+    // q6
+    lower_bounds[5] = -0.0175;
+    upper_bounds[5] = 3.7525;
+    // q7
+    lower_bounds[6] = -2.8973;
+    upper_bounds[6] = 2.8973;
 }

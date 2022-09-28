@@ -41,7 +41,7 @@ include_directories("/usr/local/include/gnuplot_module")
 
 add_library(lgp_lib SHARED
   # constraints
-
+  src/constraints/axis_in_region_constraint.cpp
   # Logic
   src/action_skeleton/skeleton.cpp
   src/action_skeleton/operators.cpp
