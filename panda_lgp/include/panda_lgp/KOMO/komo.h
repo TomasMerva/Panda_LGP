@@ -34,7 +34,7 @@ class KOMO : public MotionROSTools
         {
             uint ID;
             std::string symbolic_name;
-            double num_time_slices;
+            uint num_time_slices;
             std::vector<FeatureSymbol> constraints;
             std::vector<double> x_init;
             std::vector<double> x;

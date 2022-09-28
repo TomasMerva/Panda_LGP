@@ -43,7 +43,8 @@ add_library(lgp_lib SHARED
   # constraints
 
   # Logic
-  src/logic/operators.cpp
+  src/action_skeleton/skeleton.cpp
+  src/action_skeleton/operators.cpp
   # KOMO framework
   src/KOMO/komo.cpp
   # utils

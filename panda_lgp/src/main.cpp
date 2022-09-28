@@ -2,7 +2,8 @@
 #include <panda_lgp/KOMO/komo.h>
 #include <panda_lgp/utils/kinematics.h>
 
-#include <panda_lgp/logic/operators.h>
+#include <panda_lgp/action_skeleton/operators.h>
+#include <panda_lgp/action_skeleton/skeleton.h>
 
 
 int main(int argc, char **argv)
@@ -43,10 +44,12 @@ int main(int argc, char **argv)
         logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
     });
 
-    for (auto SE : S.operators)
-    {
-        std::cout << SE.action_name << std::endl;
-    }    
+    S.SetKOMO(&komo);
+
+    // for (auto SE : S.operators)
+    // {
+    //     std::cout << SE.action_name << std::endl;
+    // }    
 
     return 0;
 }

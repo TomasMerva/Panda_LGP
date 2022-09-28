@@ -52,3 +52,6 @@ My idea:
 
 
 
+1. Potrebujem dajak priradit nazov framu, ku danemu objektu? Alebo presnejsie musim vediet, ze o ktory objekt sa jedna na zaklade nazvu
+2. Ked budem mat toto tak potom by som mal vediet vyjadrit constraints
+- teoreticky to viem urobit naopak, vyjadrit constraints a hodnoty dat na zaklade nazvov
