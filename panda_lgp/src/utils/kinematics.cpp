@@ -62,7 +62,7 @@ Eigen::Matrix4d ForwardKinematics(Eigen::VectorXd q, bool gripper_enable)
 /// @param q -> joint angles
 /// @param gripper_enable -> is gripper used or not
 ///////////////////////////////////////////////////////////////////////
-Eigen::MatrixXd GeometricJacobian(Eigen::VectorXd q, bool gripper_enable)
+std::vector<Eigen::MatrixXd> GeometricJacobian(Eigen::VectorXd q, bool gripper_enable)
 {
     Eigen::MatrixXd J = Eigen::MatrixXd::Zero(6,7);
     Eigen::Matrix4d T1, T2, T3, T4, T5, T6, T7, T8;
@@ -108,7 +108,7 @@ Eigen::MatrixXd GeometricJacobian(Eigen::VectorXd q, bool gripper_enable)
         if(i<6) T_temp = T_temp * transformations[i+1];
     }
 
-    return J;
+    return std::vector<Eigen::MatrixXd>{J, X_EEF};
 }
 
 } // namespace

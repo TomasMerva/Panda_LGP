@@ -157,7 +157,71 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         opt.set_upper_bounds(upper_bounds);
 
         // 3. Set objective function
-        // TODO: I have to express Jacobian automatically based on the number of variables (find a pattern)
+        KOMO_k2::ObjectiveData objective;
+        objective.num_phase_variables = x_dim;
+        objective.num_phases = phases.size();
+        objective.num_iterations = 0;
+        opt.set_min_objective(KOMO_k2::GetCost, NULL);
+
+        // 4. Set constraints
+        // TODO: 
+
+        // 5. Set an initial guess
+        std::vector<double> x;
+        for (auto phase : phases)
+        {
+            std::cout << "phase size: " << phase.x_init.size() << std::endl;
+            x.insert(x.begin(), phase.x_init.begin(), phase.x_init.end());
+        }
+        std::cout << "x size: " << x.size() << std::endl;
+        
+        // 6. Optimize
+        double min_obj_value;
+        auto start_time = high_resolution_clock::now();
+        nlopt::result result;
+        try
+        {
+            result = opt.optimize(x, min_obj_value);
+            auto finish_time = high_resolution_clock::now();
+            std::cout << "------------------------------------------\n";
+            duration<double, std::milli> ms_double = finish_time - start_time;
+            std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
+            std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
+            switch (result)
+            {
+                // Positive messages
+                case 1:
+                    std::cout << "NLOPT status: Generic success return value.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                case 2:
+                    std::cout << "NLOPT status: Optimization stopped because `stopval` was reached.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                case 3:
+                    std::cout << "NLOPT status: Optimization stopped because `ftol_rel` or `ftol_abs` was reached.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                case 4:
+                    std::cout << "NLOPT status: Optimization stopped because `xtol_rel` or `xtol_abs` was reached.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                case 5:
+                    std::cout << "NLOPT status: Optimization stopped because `maxeval` was reached.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                case 6:
+                    std::cout << "NLOPT status: Optimization stopped because `maxtime` was reached.\n";
+                    std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+                    break;
+                default:
+                    break;
+            }
+        }
+        catch(std::exception &e)
+        {
+            std::cout << "nlopt failed: " << e.what() << std::endl;
+        }
 
 
     }

@@ -35,7 +35,7 @@ Eigen::Matrix4d DH_matrix(const double a, const double d,
 
 Eigen::Matrix4d ForwardKinematics(Eigen::VectorXd q, bool gripper_enable);
 
-Eigen::MatrixXd GeometricJacobian(Eigen::VectorXd q, bool gripper_enable);                     
+std::vector<Eigen::MatrixXd> GeometricJacobian(Eigen::VectorXd q, bool gripper_enable);                     
 
 
 

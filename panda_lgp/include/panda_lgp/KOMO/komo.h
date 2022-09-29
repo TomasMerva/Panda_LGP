@@ -2,12 +2,19 @@
 
 #include <cmath>
 #include <nlopt.hpp>
+#include <chrono>   // for measuring time
 
+
+#include <panda_lgp/KOMO/komo_objective.h>
 #include <panda_lgp/constraints/constraints.h>
 #include <panda_lgp/utils/motion_ros_tools.h>
 #include <panda_lgp/utils/kinematics.h>
 #include <Eigen/Dense>
 
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 enum KomoStatus{
     KS_SolutionFound,

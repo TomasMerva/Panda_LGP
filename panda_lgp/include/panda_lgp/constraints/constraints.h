@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include <Eigen/Dense>
+#include <panda_lgp/utils/kinematics.h>
+#include <cmath>
+#include <iostream>
 
 namespace Constraint
 {
@@ -18,6 +21,8 @@ enum ConstraintSymbol{
 
 typedef struct
 {
+    uint x_dim;
+    uint idx;
     Eigen::Matrix4d frame_A;
     Eigen::Matrix4d frame_B;
     std::vector<double> region = std::vector<double>(2);

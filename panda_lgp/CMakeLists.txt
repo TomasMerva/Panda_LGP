@@ -47,6 +47,7 @@ add_library(lgp_lib SHARED
   src/action_skeleton/operators.cpp
   # KOMO framework
   src/KOMO/komo.cpp
+  src/KOMO/komo_objective.cpp
   # utils
   src/utils/kinematics.cpp
   src/utils/motion_ros_tools.cpp

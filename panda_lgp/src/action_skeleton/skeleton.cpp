@@ -48,6 +48,7 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // ---- Constraints ----
                 // 1. Be in _grey_region:
                 phase_i.constraints.push_back(Constraint::AxisInRegion);
+                constraints_data[i].idx = i;
                 constraints_data[i].region = _grey_region;
                 phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
@@ -65,6 +66,7 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // ---- Constraints ----
                 // 1. Be in _red_region:
                 phase_i.constraints.push_back(Constraint::AxisInRegion);
+                constraints_data[i].idx = i;
                 constraints_data[i].region = _red_region;
                 phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
@@ -97,8 +99,9 @@ void Skeleton::SetKOMO(KOMO *komo)
     } // for -> scanning through action skeleton
 
 
-    // Transform it into NLP model
-}
+  
+} // Transform it into NLP model
+
 
 
 
