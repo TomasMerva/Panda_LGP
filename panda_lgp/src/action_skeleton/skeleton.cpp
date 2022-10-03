@@ -23,6 +23,18 @@ Skeleton::Skeleton()
 Skeleton::Skeleton(std::vector<SkeletonEntry> op)
 {
     operators = op;
+
+    // This is only range in y coordinate
+    _grey_region = {-0.5, 0.2};
+    _red_region = {0.2, 0.5};
+
+    // The cube position [x,y,z]
+    // _cube_position = {0.4, -0.3, 0.025};
+    _cube_frame << 1, 0, 0, 0.4,
+                   0, 1, 0, -0.3,
+                   0, 0, 1, 0.025,
+                   0, 0, 0, 1;
+    _cube_pos = std::vector<double>(_cube_frame.col(3).data(), _cube_frame.col(3).data()+3);
 }
 
 void Skeleton::SetKOMO(KOMO *komo)
@@ -37,7 +49,6 @@ void Skeleton::SetKOMO(KOMO *komo)
         KOMO::Phase phase_i;
         phase_i.lower_bounds = std::vector<double>(x_dim);
         phase_i.upper_bounds = std::vector<double>(x_dim);
-        // phase_i.x_init = std::vector<double>(x_dim);    // TODO:
         switch (operators[i].action_name)
         {
             case SkeletonAction::MoveF:
@@ -54,8 +65,15 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // ---- Boundaries ----
                 // 1. Joint Limits
                 komo->AddJointLimits(phase_i.lower_bounds, phase_i.upper_bounds);
+                for (uint idx_bound=7; idx_bound<10; idx_bound++)
+                {
+                    // inf number
+                    phase_i.lower_bounds[idx_bound] = -10000;
+                    phase_i.upper_bounds[idx_bound] = 10000;
+                }
                 // Init guess
-                phase_i.x_init.insert(komo->configuration.q_act.begin(), _cube_pos.begin(), _cube_pos.end());
+                phase_i.x_init.insert(phase_i.x_init.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
+                phase_i.x_init.insert(phase_i.x_init.end(), _cube_pos.begin(), _cube_pos.end());
                 komo->phases.push_back(phase_i);
                 break;
             case SkeletonAction::MoveH:
@@ -72,8 +90,15 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // ---- Boundaries ----
                 // 1. Joint Limits
                 komo->AddJointLimits(phase_i.lower_bounds, phase_i.upper_bounds);
+                for (uint idx_bound=7; idx_bound<10; idx_bound++)
+                {
+                    // inf number
+                    phase_i.lower_bounds[idx_bound] = -10000;
+                    phase_i.upper_bounds[idx_bound] = 10000;
+                }
                 // ---- Init guess ----
-                phase_i.x_init.insert(komo->configuration.q_act.begin(), _cube_pos.begin(), _cube_pos.end());
+                phase_i.x_init.insert(phase_i.x_init.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
+                phase_i.x_init.insert(phase_i.x_init.end(), _cube_pos.begin(), _cube_pos.end());
                 komo->phases.push_back(phase_i);
                 break;
 

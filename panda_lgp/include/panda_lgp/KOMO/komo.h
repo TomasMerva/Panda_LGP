@@ -55,7 +55,6 @@ class KOMO : public MotionROSTools
         };
         std::vector<Phase> phases;
 
-        kinematics::Configuration configuration;
 
     private:
 

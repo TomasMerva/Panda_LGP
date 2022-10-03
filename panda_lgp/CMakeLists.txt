@@ -11,6 +11,7 @@ endif()
 # so dynamic library libtowr.so retains link to ifopt_core.so
 set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
+find_package(autodiff)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS iostreams system filesystem)
 find_package(catkin REQUIRED COMPONENTS
@@ -55,6 +56,7 @@ add_library(lgp_lib SHARED
 target_link_libraries(lgp_lib 
                       "/usr/local/lib/libnlopt.so"
                       gnuplot_module 
+                      autodiff::autodiff
                       ${catkin_LIBRARIES})
 
 add_executable(panda_lgp src/main.cpp)
@@ -62,6 +64,7 @@ target_link_libraries(panda_lgp
                       lgp_lib
                       "/usr/local/lib/libnlopt.so"
                       gnuplot_module
+                      autodiff::autodiff
                       ${catkin_LIBRARIES}
                       ${Boost_LIBRARIES}
                       )

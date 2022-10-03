@@ -9,6 +9,7 @@ MotionROSTools::MotionROSTools(ros::NodeHandle &nh)
 {
     _marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
     _joint_pub = nh.advertise<panda_gazebo_controllers::JointPosition>("/panda/joint_position_goal", 1000);
+    _joint_state_sub = nh.subscribe("/joint_states", 1, &MotionROSTools::JointStateCallback, this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -76,3 +77,11 @@ void MotionROSTools::ExecuteTrajectory(const std::vector<std::vector<double>> re
     ROS_INFO("Trajectory command sent...");
 }
 
+
+void MotionROSTools::JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
+{
+    for (uint idx=0; idx<configuration.q_dim; idx++)
+    {
+        configuration.q_act[idx] = msg->position[idx];
+    }
+}

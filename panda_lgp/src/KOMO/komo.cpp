@@ -141,7 +141,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         // 1. Choose solver and set decision variables
         nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, phases.size()*x_dim);
         nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_dim);
-        opt.set_xtol_abs(1e-6);
+        opt.set_xtol_rel(1e-6);
         opt.set_local_optimizer(local_opt);
 
         // 2. Set boundaries
@@ -161,7 +161,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         objective.num_phase_variables = x_dim;
         objective.num_phases = phases.size();
         objective.num_iterations = 0;
-        opt.set_min_objective(KOMO_k2::GetCost, NULL);
+        opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
         // 4. Set constraints
         // TODO: 
@@ -170,10 +170,8 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         std::vector<double> x;
         for (auto phase : phases)
         {
-            std::cout << "phase size: " << phase.x_init.size() << std::endl;
-            x.insert(x.begin(), phase.x_init.begin(), phase.x_init.end());
+            x.insert(x.end(), phase.x_init.begin(), phase.x_init.end());
         }
-        std::cout << "x size: " << x.size() << std::endl;
         
         // 6. Optimize
         double min_obj_value;
@@ -223,6 +221,26 @@ KomoStatus KOMO::Optimize(LgpLevel level)
             std::cout << "nlopt failed: " << e.what() << std::endl;
         }
 
+            // Convert to phases
+            uint begin = 0;
+            uint end = 10;
+            for (auto &phase : phases)
+            {
+                phase.x.insert(phase.x.begin(), x.begin()+begin, x.begin()+end);
+                begin = end;
+                end += end;
+            }
+            
+            // print results
+            for (auto phase : phases)
+            {
+                std::cout << "Phase: " << phase.symbolic_name << "\n";
+                for (auto phase_x : phase.x)
+                {
+                    std::cout << phase_x << "\t";
+                }
+                std::cout <<"\n\n";
+            }
 
     }
     else if(level == LgpLevel::THIRD_LEVEL)
@@ -233,31 +251,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
     {}
     
 
-    
 
-    // 3. Set objective
-
-
-    // 4. Solve
-
-
-
-    // if (level == LgpLevel::SECOND_LEVEL)
-    // {
-    //     // nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, x->GetNumVariables());
-    //     // nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, x->GetNumVariables());
-    //     // opt.set_xtol_abs(1e-6);
-    //     // opt.set_local_optimizer(local_opt);
-    // }
-    // else if (level == LgpLevel::THIRD_LEVEL)
-    // {
-    //     // nlopt::opt opt(nlopt::algorithm::LD_AUGLAG, x->GetNumVariables());
-    //     // nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, x->GetNumVariables());
-    //     // opt.set_xtol_abs(1e-6);
-    //     // opt.set_local_optimizer(local_opt);
-    // }
-    // else
-    // {}
 }
 
 
@@ -285,3 +279,4 @@ void KOMO::AddJointLimits(std::vector<double> &lower_bounds, std::vector<double>
     lower_bounds[6] = -2.8973;
     upper_bounds[6] = 2.8973;
 }
+

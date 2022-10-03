@@ -10,9 +10,13 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "test_nlopt");
     ros::NodeHandle nh;
+    
+    // ROS init
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
 
-    kinematics::Configuration robot_config;
     KOMO komo(nh);
+    ros::Duration(0.1).sleep();
     // num_phases, time slices, seconds for traj, k-order
     // komo.SetTiming(4, 20, 5, 2);
 
@@ -52,10 +56,7 @@ int main(int argc, char **argv)
     komo.Optimize(LgpLevel::SECOND_LEVEL);
 
 
-    // for (auto SE : S.operators)
-    // {
-    //     std::cout << SE.action_name << std::endl;
-    // }    
 
+    ros::waitForShutdown();
     return 0;
 }
