@@ -60,12 +60,13 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // 1. Be in _grey_region:
                 phase_i.constraints.push_back(Constraint::AxisInRegion);
                 constraints_data[i].idx = i;
+                constraints_data[i].num_phase_variables = x_dim;
                 constraints_data[i].region = _grey_region;
                 phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
                 // 1. Joint Limits
                 komo->AddJointLimits(phase_i.lower_bounds, phase_i.upper_bounds);
-                for (uint idx_bound=7; idx_bound<10; idx_bound++)
+                for (uint idx_bound=7; idx_bound<10; ++idx_bound)
                 {
                     // inf number
                     phase_i.lower_bounds[idx_bound] = -10000;
@@ -85,12 +86,13 @@ void Skeleton::SetKOMO(KOMO *komo)
                 // 1. Be in _red_region:
                 phase_i.constraints.push_back(Constraint::AxisInRegion);
                 constraints_data[i].idx = i;
+                constraints_data[i].num_phase_variables = x_dim;
                 constraints_data[i].region = _red_region;
                 phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
                 // 1. Joint Limits
                 komo->AddJointLimits(phase_i.lower_bounds, phase_i.upper_bounds);
-                for (uint idx_bound=7; idx_bound<10; idx_bound++)
+                for (uint idx_bound=7; idx_bound<10; ++idx_bound)
                 {
                     // inf number
                     phase_i.lower_bounds[idx_bound] = -10000;
@@ -98,6 +100,7 @@ void Skeleton::SetKOMO(KOMO *komo)
                 }
                 // ---- Init guess ----
                 phase_i.x_init.insert(phase_i.x_init.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
+                komo->AddJointLimits(phase_i.x_init, phase_i.x_init);
                 phase_i.x_init.insert(phase_i.x_init.end(), _cube_pos.begin(), _cube_pos.end());
                 komo->phases.push_back(phase_i);
                 break;

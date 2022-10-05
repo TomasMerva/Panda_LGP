@@ -20,7 +20,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
     ifopt::Problem nlp;
     auto g = std::make_shared<AddPointToPointDistanceConstraint>();
     nlp.AddVariableSet(std::make_unique<JointVariables>("x", _num_joints, _num_time_slices, _q_start, _q_goal));
-    nlp.AddConstraintSet(g);
+    // nlp.AddConstraintSet(g);
 
     // nlp.AddConstraintSet(std::make_unique<AddPointToPointDistanceConstraint>());
     nlp.AddCostSet(std::make_unique<KOMO_k2_Objective>("k_order=2", _num_joints, _num_time_slices));
@@ -38,7 +38,7 @@ std::vector<std::vector<double>> KOMO::Optimize()
     ipopt.SetOption("nlp_scaling_max_gradient", 100.0);
 
     
-    // ipopt.SetOption("derivative_test", "first-order");
+    ipopt.SetOption("derivative_test", "first-order");
     
     // 3. solve
     ipopt.Solve(nlp);

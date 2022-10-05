@@ -20,9 +20,6 @@ typedef struct
 }ObjectiveData;
 
 double GetCost(const std::vector<double> &x, std::vector<double> &grad, void *data);    
-void FillJacobianBlock(const std::vector<double> &x, std::vector<double> &jac, ObjectiveData *data);
-void GetStateNodes(const std::vector<double> &vector_set, Eigen::MatrixXd  &internal_rep_set);
-
-VectorXreal Objective(const VectorXreal& x);
+real Objective(const ArrayXreal& x, const real& num_phase_variables);
 
 } // namespace

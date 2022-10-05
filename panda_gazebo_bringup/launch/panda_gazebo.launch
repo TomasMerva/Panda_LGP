@@ -6,7 +6,7 @@
   <arg name="headless"    default="false" doc="Should the gazebo GUI be launched?" />
   <arg name="paused"      default="false" doc="Should the simulation directly be stopped at 0s?" />
   <!-- <arg name="world"       default="worlds/empty.world" doc="Filename to a SDF World for gazebo to use" /> -->
-  <arg name="world"       default="$(find panda_gazebo_bringup)/world/box_collision.world"/>
+  <arg name="world"       default="$(find panda_gazebo_bringup)/world/pick_grey_red_region.world"/>
   <arg name="rviz"        default="false" doc="Should RVIz be launched?" />
 
   <!-- Robot Customization -->
@@ -19,15 +19,16 @@
   <arg name="roll"        default="0"     doc="How much to rotate the base of the robot around its X-axis in [rad]?" />
   <arg name="pitch"       default="0"     doc="How much to rotate the base of the robot around its Y-axis in [rad]?" />
   <arg name="yaw"         default="0"     doc="How much to rotate the base of the robot around its Z-axis in [rad]?" />
+  <arg name="xacro_args"  default=""      doc="Additional arguments to pass to panda.urdf.xacro" />
   <arg name="initial_joint_positions"
        doc="Initial joint configuration of the panda. Specify as a list of name/value pairs in form of '-J [name-of-joint] [value-in-rad]'. Default is a 90 degree bend in the elbow"
-       default="-J $(arg arm_id)_joint1 0
-                -J $(arg arm_id)_joint2 -0.785398163
-                -J $(arg arm_id)_joint3 0
-                -J $(arg arm_id)_joint4 -2.35619449
-                -J $(arg arm_id)_joint5 0
-                -J $(arg arm_id)_joint6 1.57079632679
-                -J $(arg arm_id)_joint7 0.785398163397
+       default="-J $(arg arm_id)_joint1 0.41447
+                -J $(arg arm_id)_joint2 0.01096
+                -J $(arg arm_id)_joint3 0.40034
+                -J $(arg arm_id)_joint4 -2.5392
+                -J $(arg arm_id)_joint5 0.11275
+                -J $(arg arm_id)_joint6 2.53202
+                -J $(arg arm_id)_joint7 1.47770
                 -J $(arg arm_id)_finger_joint1 0.001
                 -J $(arg arm_id)_finger_joint2 0.001" />
        
@@ -53,6 +54,17 @@
                 -J $(arg arm_id)_finger_joint2 0.001"   -->
 
 
+          <!-- "-J $(arg arm_id)_joint1 0
+                -J $(arg arm_id)_joint2 -0.785398163
+                -J $(arg arm_id)_joint3 0
+                -J $(arg arm_id)_joint4 -2.35619449
+                -J $(arg arm_id)_joint5 0
+                -J $(arg arm_id)_joint6 1.57079632679
+                -J $(arg arm_id)_joint7 0.785398163397
+                -J $(arg arm_id)_finger_joint1 0.001
+                -J $(arg arm_id)_finger_joint2 0.001" -->
+
+
   <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg gazebo)">
     <arg name="world_name" value="$(arg world)"/>
     <!-- Always start in paused mode, and only unpause when spawning the model -->
@@ -61,14 +73,16 @@
     <arg name="use_sim_time" value="true"/>
   </include>
 
-  <param name="robot_description"
-         command="xacro $(find franka_description)/robots/panda_arm.urdf.xacro
+ <param name="robot_description"
+         command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
                   gazebo:=true
                   hand:=$(arg use_gripper)
                   arm_id:=$(arg arm_id)
                   xyz:='$(arg x) $(arg y) $(arg z)'
-                  rpy:='$(arg roll) $(arg pitch) $(arg yaw)'">
+                  rpy:='$(arg roll) $(arg pitch) $(arg yaw)'
+                  $(arg xacro_args)">
   </param>
+
 
   <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
   <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />
@@ -95,11 +109,11 @@
   />
 
   <!-- spawns the controller after the robot was put into its initial joint pose -->
-  <node pkg="franka_gazebo"
-        type="delayed_controller_spawner.py"
+  <node pkg="controller_manager"
+        type="spawner"
         name="$(arg arm_id)_controller_spawner"
         respawn="false" output="screen"
-        args="franka_state_controller $(arg controller)"
+        args="--wait-for initialized franka_state_controller $(arg controller)"
   />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />

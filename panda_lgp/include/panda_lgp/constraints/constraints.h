@@ -21,7 +21,7 @@ enum ConstraintSymbol{
 
 typedef struct
 {
-    uint x_dim;
+    uint num_phase_variables;
     uint idx;
     Eigen::Matrix4d frame_A;
     Eigen::Matrix4d frame_B;

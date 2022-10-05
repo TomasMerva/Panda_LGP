@@ -53,9 +53,24 @@ int main(int argc, char **argv)
     });
 
     S.SetKOMO(&komo);
-    komo.Optimize(LgpLevel::SECOND_LEVEL);
+    KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
+    if (komo_status == KomoStatus::KS_SolutionFound)
+    {
+        for (auto const phase : komo.phases)
+        {
+            std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
+            for (auto const x_phase : phase.x)
+            {
+                std::cout << x_phase << "      ";
+            }
+            std::cout << "]\n";
+            auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
+            std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
+        }
+    }
 
-
+    
+    
 
     ros::waitForShutdown();
     return 0;

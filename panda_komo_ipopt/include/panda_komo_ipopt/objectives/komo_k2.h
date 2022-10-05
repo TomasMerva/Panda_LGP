@@ -2,6 +2,9 @@
 
 #include <ifopt/cost_term.h>
 
+#include <autodiff/forward/real.hpp>
+#include <autodiff/forward/real/eigen.hpp>
+using namespace autodiff;
 
 using Vector2d = Eigen::Vector2d;
 
@@ -14,9 +17,12 @@ class KOMO_k2_Objective : public ifopt::CostTerm
         double GetCost() const override;
         void FillJacobianBlock (std::string var_set, Jacobian& jac) const override;
         void GetStateNodes(VectorXd &sym_set, Eigen::MatrixXd  &internal_set) const;
+        static real Objective(const ArrayXreal& x);
+
 
     private:
         int _num_variables;
         int _num_time_slices;
+        static Eigen::VectorXd _g;
 };
 

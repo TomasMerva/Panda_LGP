@@ -34,9 +34,9 @@ int main(int argc, char **argv)
     spinner.start();
     ros::Subscriber joint_state_sub = nh.subscribe("/joint_states", 1, JointStateCallback);
     
-    // std::vector<double> q_start{-0.7, 0.3762, -0.1474, -2.0439, 0.0354, 2.4312, 0.1813};    // starting position
-    // std::vector<double> q_goal{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
-    std::vector<double> q_goal{0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019};    // second position
+    // std::vector<double> q_goal{-0.7, 0.3762, -0.1474, -2.0439, 0.0354, 2.4312, 0.1813};    // starting position
+    std::vector<double> q_goal{0.6569, 0.5686, 0.1156, -1.739, -0.055, 2.3598, 1.5583};    // second position
+    // std::vector<double> q_goal{0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019};    // second position
 
     const int num_joints = 7;
     const int num_time_slices = 20;
