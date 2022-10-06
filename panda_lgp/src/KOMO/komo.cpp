@@ -15,64 +15,7 @@ KOMO::KOMO(ros::NodeHandle &nh)
 ///////////////////////////////////////////////////////////////////////
 void KOMO::SetModel(kinematics::Configuration robot_conf, LgpLevel level)
 {    
-    if (level == LgpLevel::SECOND_LEVEL)
-    {
-        // Dim of the decision variables and their boundaries
-        uint x_t_dim = robot_conf.q_dim + robot_conf.frame_dim;
-        _NLP_model.x_dim = x_t_dim * phases.size();
-        _NLP_model.lower_bounds = std::vector<double>(_NLP_model.x_dim);
-        _NLP_model.upper_bounds = std::vector<double>(_NLP_model.x_dim);
-
-        for (uint id = 0; id < phases.size(); ++id)
-        {
-            // ---- Set joint limits ----
-            // q1 limit
-            _NLP_model.lower_bounds[0+id*x_t_dim] = robot_conf.joint_limits.q1_limit.first;
-            _NLP_model.upper_bounds[0+id*x_t_dim] = robot_conf.joint_limits.q1_limit.second;
-            // q2 limit
-            _NLP_model.lower_bounds[1+id*x_t_dim] = robot_conf.joint_limits.q2_limit.first;
-            _NLP_model.upper_bounds[1+id*x_t_dim] = robot_conf.joint_limits.q2_limit.second;
-            // q3 limit
-            _NLP_model.lower_bounds[2+id*x_t_dim] = robot_conf.joint_limits.q3_limit.first;
-            _NLP_model.upper_bounds[2+id*x_t_dim] = robot_conf.joint_limits.q3_limit.second;
-            // q4 limit
-            _NLP_model.lower_bounds[3+id*x_t_dim] = robot_conf.joint_limits.q4_limit.first;
-            _NLP_model.upper_bounds[3+id*x_t_dim] = robot_conf.joint_limits.q4_limit.second;
-            // q5 limit
-            _NLP_model.lower_bounds[4+id*x_t_dim] = robot_conf.joint_limits.q5_limit.first;
-            _NLP_model.upper_bounds[4+id*x_t_dim] = robot_conf.joint_limits.q5_limit.second;
-            // q6 limit
-            _NLP_model.lower_bounds[5+id*x_t_dim] = robot_conf.joint_limits.q6_limit.first;
-            _NLP_model.upper_bounds[5+id*x_t_dim] = robot_conf.joint_limits.q6_limit.second;
-            // q7 limit
-            _NLP_model.lower_bounds[6+id*x_t_dim] = robot_conf.joint_limits.q7_limit.first;
-            _NLP_model.upper_bounds[6+id*x_t_dim] = robot_conf.joint_limits.q7_limit.second;
-
-            // ---- Set object limits ----
-            
-        }
-    }
-    else if (level == LgpLevel::THIRD_LEVEL)
-    {
-        // Dim of the decision variables
-       _NLP_model.x_dim = (robot_conf.q_dim * phases[0].num_time_slices) * phases.size();
-    }
-    else
-    {}
-
-    for (auto lb : _NLP_model.lower_bounds)
-    {
-        std::cout << lb << "\t";
-    }
-    std::cout << "\n";
-
- //   _configuration = robot_conf;
-
-    /*
-    1. Vytvorit jeden velky vektor na zaklade info z phases pre NLOPT
-    2. Vytvorit boundaries pre tento vektor
-    3. Ako riesit constraints?
-    */
+ 
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -145,7 +88,8 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         // opt.set_xtol_abs(1e-6);
   
         opt.set_local_optimizer(local_opt);
-              local_opt.set_xtol_abs(-1);
+        local_opt.set_xtol_abs(-1);
+        local_opt.set_xtol_rel(-1);
         local_opt.set_ftol_abs(-1);
         local_opt.set_ftol_rel(-1);
 
@@ -182,7 +126,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
                 opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
             }
         }
-
+        
         // 5. Set an initial guess
         std::vector<double> x;
         for (auto &phase : phases)
@@ -194,6 +138,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         double min_obj_value;
         auto start_time = high_resolution_clock::now();
         nlopt::result result;
+        
         try
         {
             result = opt.optimize(x, min_obj_value);
@@ -230,6 +175,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
                     std::cout << "EXIT: Optimal Solution Found.\n--------\n";
                     break;
                 default:
+                    std::cout << "result code: " << result << "\n";
                     break;
             }
             // Convert to phases
@@ -246,6 +192,7 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         catch(std::exception &e)
         {
             std::cout << "nlopt failed: " << e.what() << std::endl;
+            std::cout << "result code: " << result << "\n";
             std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
             return KomoStatus::KS_CannotFindSolution;
         }

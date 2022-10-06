@@ -14,7 +14,7 @@ double Constraint::AxisInRegion(const std::vector<double> &x, std::vector<double
     double middle_region = g_data->region[0] - (g_data->region[0] - g_data->region[1])/2.0;
 
     double diff = FK(1,3) - middle_region;
-    double l2_norm = std::sqrt(std::pow(diff, 2));
+    double l2_norm = std::sqrt(std::pow(diff, 2))-middle_region;
 
     if (!grad.empty())
     {
@@ -26,6 +26,6 @@ double Constraint::AxisInRegion(const std::vector<double> &x, std::vector<double
             grad[i + g_data->idx * g_data->num_phase_variables] = dg(i);
         }
     }
-    return l2_norm - middle_region;
+    return l2_norm;
 }
 

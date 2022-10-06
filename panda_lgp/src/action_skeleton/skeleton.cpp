@@ -100,7 +100,7 @@ void Skeleton::SetKOMO(KOMO *komo)
                 }
                 // ---- Init guess ----
                 phase_i.x_init.insert(phase_i.x_init.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
-                komo->AddJointLimits(phase_i.x_init, phase_i.x_init);
+                // komo->AddJointLimits(phase_i.x_init, phase_i.x_init);
                 phase_i.x_init.insert(phase_i.x_init.end(), _cube_pos.begin(), _cube_pos.end());
                 komo->phases.push_back(phase_i);
                 break;

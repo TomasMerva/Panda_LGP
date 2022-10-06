@@ -12,7 +12,6 @@ double GetCost(const std::vector<double> &x, std::vector<double> &grad, void *da
     d->num_iterations++;   
 
     ArrayXreal x_diff = Eigen::Map<const Eigen::ArrayXd>(x.data(), x.size());
-    std::cout << x_diff.transpose()  << "\n" << std::endl;
 
     real num_phase_variables(d->num_phase_variables);
     real F;
