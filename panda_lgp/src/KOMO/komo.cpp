@@ -79,26 +79,17 @@ KomoStatus KOMO::Optimize(LgpLevel level)
 {
     if (level == LgpLevel::SECOND_LEVEL)
     {
-        uint x_dim = 7 + 3; //q(7) + cube[x,y,z]
+        uint x_phase_dim = 7 + 6 + 3; //q(7) + 6DoF (manipulation frame) + cube[x,y,z]
 
-        // 1. Choose solver and set decision variables LD_TNEWTON_PRECOND_RESTART
-        nlopt::opt opt(nlopt::algorithm::AUGLAG, phases.size()*x_dim);
-        nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_dim);
+        //---- 1. Choose solver and set decision variables LD_TNEWTON_PRECOND_RESTART ----
+        nlopt::opt opt(nlopt::algorithm::AUGLAG, phases.size()*x_phase_dim);
+        nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_phase_dim);
         // opt.set_xtol_rel(1e-6);
-        // opt.set_xtol_abs(1e-6);
-  
+        // opt.set_xtol_abs(1e-6);  
         opt.set_local_optimizer(local_opt);
-        local_opt.set_xtol_abs(-1);
-        local_opt.set_xtol_rel(-1);
-        local_opt.set_ftol_abs(-1);
-        local_opt.set_ftol_rel(-1);
 
-        opt.set_xtol_rel(-1);
-        opt.set_xtol_abs(-1);
-        opt.set_ftol_rel(-1);
-        opt.set_ftol_abs(-1);
 
-        // 2. Set boundaries
+        //---- 2. Set boundaries ----
         // - convert boundaries from all phases into one vector
         std::vector<double> lower_bounds;
         std::vector<double> upper_bounds;
@@ -110,22 +101,28 @@ KomoStatus KOMO::Optimize(LgpLevel level)
         opt.set_lower_bounds(lower_bounds);
         opt.set_upper_bounds(upper_bounds);
 
-        // 3. Set objective function
+        //---- 3. Set objective function ----
         KOMO_k2::ObjectiveData objective;
-        objective.num_phase_variables = x_dim;
+        objective.num_phase_variables = x_phase_dim;
         objective.num_phases = phases.size();
         objective.num_iterations = 0;
         opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
-        // 4. Set constraints
-        const double k_tolerance = 1e-10;
-        for (auto &phase : phases)
-        {
-            for (uint i=0; i<phase.constraints.size(); ++i)
-            {
-                opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
-            }
-        }
+        //---- 4. Set constraints ----
+        const double k_tolerance = 1e-8;
+        // Set Manipulation frame constraint
+        Constraint::ConstraintData g_manip_frame_data;
+        g_manip_frame_data.num_phase_variables = x_phase_dim;
+        opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance);
+
+        // 
+        // for (auto &phase : phases)
+        // {
+        //     for (uint i=0; i<phase.constraints.size(); ++i)
+        //     {
+        //         opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
+        //     }
+        // }
         
         // 5. Set an initial guess
         std::vector<double> x;

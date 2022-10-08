@@ -53,6 +53,8 @@ int main(int argc, char **argv)
     });
 
     S.SetKOMO(&komo);
+
+
     KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
     if (komo_status == KomoStatus::KS_SolutionFound)
     {
@@ -68,6 +70,12 @@ int main(int argc, char **argv)
             std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
         }
     }
+    else
+    {
+        std::cout << "No solution has been found" << std::endl;
+    }
+
+
 
     
     

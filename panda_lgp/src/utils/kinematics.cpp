@@ -28,7 +28,7 @@ Eigen::Matrix4d DH_matrix(const double a, const double d,
 /// @param q -> joint angles
 /// @param gripper_enable -> is gripper used or not
 ///////////////////////////////////////////////////////////////////////
-Eigen::Matrix4d ForwardKinematics(Eigen::VectorXd q, bool gripper_enable)
+Eigen::Matrix4d ForwardKinematics(const Eigen::VectorXd q, const bool gripper_enable)
 {
     Eigen::Matrix4d T1, T2, T3, T4, T5, T6, T7, T8;
     if (gripper_enable)
@@ -62,7 +62,7 @@ Eigen::Matrix4d ForwardKinematics(Eigen::VectorXd q, bool gripper_enable)
 /// @param q -> joint angles
 /// @param gripper_enable -> is gripper used or not
 ///////////////////////////////////////////////////////////////////////
-std::vector<Eigen::MatrixXd> GeometricJacobian(Eigen::VectorXd q, bool gripper_enable)
+std::vector<Eigen::MatrixXd> GeometricJacobian(const Eigen::VectorXd q, const bool gripper_enable)
 {
     Eigen::MatrixXd J = Eigen::MatrixXd::Zero(6,7);
     Eigen::Matrix4d T1, T2, T3, T4, T5, T6, T7, T8;
@@ -109,6 +109,15 @@ std::vector<Eigen::MatrixXd> GeometricJacobian(Eigen::VectorXd q, bool gripper_e
     }
 
     return std::vector<Eigen::MatrixXd>{J, X_EEF};
+}
+
+
+std::vector<double> ConvertToRPY(const Eigen::Matrix4d frame)
+{
+    double z = atan2(frame(1,0), frame(0, 0));
+    double y = atan2(frame(2,0), std::sqrt(std::pow(frame(2,1),2) + std::pow(frame(2,2), 2)));
+    double x = atan2(frame(2,1), frame(2,2));
+    return std::vector<double>{x,y,z};
 }
 
 } // namespace

@@ -1,0 +1,29 @@
+Problemy:
+1. Stracam cas na derivaciach
+2. nemam spatnu vazbu pre NLOPT
+
+CasADi
++ zrychleny development
++ nemusim riesit derivacie
++ je to rychle
+- nemam to rozchodene v C++
+- neviem z toho dostat derivacie
+- slaba podpora
+
+NLOPT
++ presne algoritmy pre KOMO
++ rychle
+- nemam urobeny debugging
+- nemam velky feedback z toho
+
+IFOPT
+- kedze tam Hessian tak to je pomale
+
+
+
+- v Matlabe celkom rychlo si viem prototypovat, co kebyze si tam kontrolujem constraints?
+    Zisti ze ako dostat zo symbolickeho tvaru spojity
+
+
+
+

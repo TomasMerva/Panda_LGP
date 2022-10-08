@@ -58,17 +58,7 @@ class KOMO : public MotionROSTools
 
 
     private:
-
-        struct OptimModel
-        {
-            uint x_dim;
-            std::vector<double> x; // first value is init guess
-            std::vector<double> lower_bounds;
-            std::vector<double> upper_bounds;
-        };
-        OptimModel _NLP_model;
-        
-            
+        uint _x_dim;
 };
 
 

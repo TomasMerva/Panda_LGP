@@ -33,10 +33,11 @@ struct Configuration
 Eigen::Matrix4d DH_matrix(const double a, const double d, 
                           const double alpha, const double theta);
 
-Eigen::Matrix4d ForwardKinematics(Eigen::VectorXd q, bool gripper_enable);
+Eigen::Matrix4d ForwardKinematics(const Eigen::VectorXd q, const bool gripper_enable);
 
-std::vector<Eigen::MatrixXd> GeometricJacobian(Eigen::VectorXd q, bool gripper_enable);                     
+std::vector<Eigen::MatrixXd> GeometricJacobian(const Eigen::VectorXd q, const bool gripper_enable);                     
 
+std::vector<double> ConvertToRPY(const Eigen::Matrix4d frame);
 
 
 } // namespace
