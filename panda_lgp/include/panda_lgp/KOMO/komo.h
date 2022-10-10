@@ -58,6 +58,10 @@ class KOMO : public MotionROSTools
 
 
     private:
+        KomoStatus SecondLevel();
+        KomoStatus ThirdLevel();
+        void VerboseSolver(const nlopt::result &result); 
+
         uint _x_dim;
 };
 

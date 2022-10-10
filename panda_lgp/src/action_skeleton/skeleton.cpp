@@ -70,23 +70,36 @@ Skeleton::SetKOMO(KOMO *komo)
 {
     std::vector<Constraint::ConstraintData> constraints_data(operators.size());
 
-    for (uint i=0; i<operators.size(); ++i)
+    // Add init phase
+    KOMO::Phase phase_init;
+    phase_init.ID = 0;
+    phase_init.symbolic_name = "Init_state";
+    phase_init.lower_bounds = std::vector<double>(_x_phase_dim);
+    phase_init.upper_bounds = std::vector<double>(_x_phase_dim);
+    komo->AddJointLimits(phase_init.lower_bounds, phase_init.upper_bounds);
+    phase_init.x_init.insert(phase_init.x_init.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
+    phase_init.x.insert(phase_init.x.end(), komo->configuration.q_act.begin(), komo->configuration.q_act.end());
+    komo->phases.push_back(phase_init);
+
+    // Add phases from skeleton
+    for (uint i=1; i<=operators.size(); ++i)    // constraints will overflow because of i<=operators.size
     {
         KOMO::Phase phase_i;
         phase_i.lower_bounds = std::vector<double>(_x_phase_dim);
         phase_i.upper_bounds = std::vector<double>(_x_phase_dim);
-        switch (operators[i].action_name)
+        switch (operators[i-1].action_name)
         {
             case SkeletonAction::MoveF:
                 // ---- General info ----
                 phase_i.ID = i;
                 phase_i.symbolic_name = "MoveF";
+                // ---- Constraints ----
                 //  1. Be in _grey_region:
-                phase_i.constraints.push_back(Constraint::AxisInRegion);
-                constraints_data[i].idx = i;
-                constraints_data[i].num_phase_variables = _x_phase_dim;
-                constraints_data[i].region = _grey_region;
-                phase_i.constraints_data.push_back(constraints_data[i]);
+                // phase_i.constraints.push_back(Constraint::AxisInRegion);
+                // constraints_data[i].idx = i;
+                // constraints_data[i].num_phase_variables = _x_phase_dim;
+                // constraints_data[i].region = _grey_region;
+                // phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
                 SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
                 // ---- Init guess ----
@@ -100,12 +113,12 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.ID = i;
                 phase_i.symbolic_name = "MoveH";
                 // ---- Constraints ----
-                //  1. Be in _red_region:
-                phase_i.constraints.push_back(Constraint::AxisInRegion);
-                constraints_data[i].idx = i;
-                constraints_data[i].num_phase_variables = _x_phase_dim;
-                constraints_data[i].region = _red_region;
-                phase_i.constraints_data.push_back(constraints_data[i]);
+                // //  1. Be in _red_region:
+                // phase_i.constraints.push_back(Constraint::AxisInRegion);
+                // constraints_data[i].idx = i;
+                // constraints_data[i].num_phase_variables = _x_phase_dim;
+                // constraints_data[i].region = _red_region;
+                // phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
                 SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
                 // ---- Init guess ----
