@@ -231,83 +231,96 @@ KOMO::ThirdLevel()
     uint x_phase_dim = 7; //q(7)
     uint phase_time_steps = 20;    
 
-    // ---- 1. Choose solver and set decision variables LD_TNEWTON_PRECOND_RESTART ----
-    nlopt::opt opt(nlopt::algorithm::AUGLAG, phases.size()*x_phase_dim*phase_time_steps);
-    nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_phase_dim*phase_time_steps);
-    opt.set_xtol_rel(1e-6);
-    opt.set_xtol_abs(1e-6);  
-    opt.set_local_optimizer(local_opt);
-
-    // ---- 2. Set boundaries ----
-    std::vector<double> lower_bounds;
-    std::vector<double> upper_bounds;
-    for (uint phase_idx = 0; phase_idx<(phases.size()-1); ++phase_idx)
+    for (uint idx=0; idx<phases.size()-1; ++idx)
     {
+        std::cout << "Trajectory between: " << phases[idx].symbolic_name << " and " << phases[idx+1].symbolic_name << "\n";
+
+        // ---- 1. Choose solver and set decision variables LD_TNEWTON_PRECOND_RESTART ----
+        nlopt::opt opt(nlopt::algorithm::AUGLAG, x_phase_dim*phase_time_steps);
+        nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, x_phase_dim*phase_time_steps);
+        opt.set_xtol_rel(1e-6);
+        opt.set_xtol_abs(1e-6);  
+        opt.set_local_optimizer(local_opt);
+
+        // ---- 2. Set boundaries ----
+        std::vector<double> lower_bounds;
+        std::vector<double> upper_bounds;
         for (uint t=0; t<phase_time_steps; ++t)
         {
             // Start state in a phase defined by 2.level or an user
-            if (t==0)   
+            if (t==0)
             {
-                lower_bounds.insert(lower_bounds.end(), phases[phase_idx].x.begin(), phases[phase_idx].x.end());
-                upper_bounds.insert(upper_bounds.end(), phases[phase_idx].x.begin(), phases[phase_idx].x.end());
+                lower_bounds.insert(lower_bounds.end(), phases[idx].x.begin(), phases[idx].x.begin()+x_phase_dim);
+                upper_bounds.insert(upper_bounds.end(), phases[idx].x.begin(), phases[idx].x.begin()+x_phase_dim);
             }
             // End state in a phase defined by 2.level or an user
             // I am taking from phase[t+1]
-            else if (t==phase_time_steps-1) 
+            else if (t==phase_time_steps-1)
             {
-                lower_bounds.insert(lower_bounds.end(), phases[phase_idx+1].x.begin(), phases[phase_idx+1].x.end());
-                upper_bounds.insert(upper_bounds.end(), phases[phase_idx+1].x.begin(), phases[phase_idx+1].x.end());
+                lower_bounds.insert(lower_bounds.end(), phases[idx+1].x.begin(), phases[idx+1].x.begin()+x_phase_dim);
+                upper_bounds.insert(upper_bounds.end(), phases[idx+1].x.begin(), phases[idx+1].x.begin()+x_phase_dim);
             }
-            // I am taking from phase[t+1]
             else
             {
-                lower_bounds.insert(lower_bounds.end(), phases[phase_idx+1].lower_bounds.begin(), phases[phase_idx+1].lower_bounds.end());
-                upper_bounds.insert(upper_bounds.end(), phases[phase_idx+1].upper_bounds.begin(), phases[phase_idx+1].upper_bounds.end());
+                lower_bounds.insert(lower_bounds.end(), phases[idx].lower_bounds.begin(), phases[idx].lower_bounds.begin()+x_phase_dim);
+                upper_bounds.insert(upper_bounds.end(), phases[idx].upper_bounds.begin(), phases[idx].upper_bounds.begin()+x_phase_dim);
             }
         }
+        opt.set_lower_bounds(lower_bounds);
+        opt.set_upper_bounds(upper_bounds);
+
+        // ---- 3. Set objective function ----
+        KOMO_k2::ObjectiveData objective;
+        objective.num_phase_variables = x_phase_dim;
+        objective.num_iterations = 0;
+        opt.set_min_objective(KOMO_k2::GetCost, &objective);
+
+        // ---- 4. Set constraints ----
+
+        // ---- 5. Set an initial guess ----
+        std::vector<double> x = SetInitialGuess(phases[idx].x, phases[idx+1].x);
+        
+        // ---- 6. Optimize ----
+        double min_obj_value;
+        auto start_time = high_resolution_clock::now();
+        nlopt::result result;
+        try
+        {
+            result = opt.optimize(x, min_obj_value);
+            auto finish_time = high_resolution_clock::now();
+            std::cout << "------------------------------------------\n";
+            duration<double, std::milli> ms_double = finish_time - start_time;
+            std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
+            std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
+            VerboseSolver(result);
+            std::cout << "x size: " << x.size() << std::endl;
+            
+            // ---- 7. Save results ----
+            uint begin = 0;
+            uint end = x_phase_dim;
+            for (uint t=0; t<phase_time_steps; ++t)
+            {
+                std::vector<double> temp(x.begin()+begin, x.begin()+end);
+                phases[idx].q_trajectory.push_back(temp);
+                begin = end;
+                end += x_phase_dim;
+            }
+        }
+        catch(std::exception &e)
+        {
+            std::cout << "nlopt failed: " << e.what() << std::endl;
+            std::cout << "result code: " << result << "\n";
+            std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
+            return KomoStatus::KS_CannotFindSolution;
+        }
     }
-    opt.set_lower_bounds(lower_bounds);
-    opt.set_upper_bounds(upper_bounds);
-
-    for (auto lb : lower_bounds)
-    {
-        std::cout << lb << "    ";
-    }
-    std::cout << "\n";
-
-    // ---- 3. Set objective function ----
-
-    // ---- 4. Set constraints ----
-
-    // ---- 5. Set initial guess ----
-
-    // ---- 6. Optimize ----
-    // double min_obj_value;
-    // auto start_time = high_resolution_clock::now();
-    // nlopt::result result;
-    // try
-    // {
-    //     result = opt.optimize(q, min_obj_value);
-    //     auto finish_time = high_resolution_clock::now();
-    //     std::cout << "------------------------------------------\n";
-    //     duration<double, std::milli> ms_double = finish_time - start_time;
-    //     std::cout << "Number of iterations: \t=\t" << objective->num_iterations << "\n";
-    //     std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
-    //     VerboseSolver(result);
-
-
-    //     return KomoStatus::KS_SolutionFound;
-    // }
-    // catch(std::exception &e)
-    // {
-    //     std::cout << "nlopt failed: " << e.what() << std::endl;
-    //     std::cout << "result code: " << result << "\n";
-    //     std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
-    //     return KomoStatus::KS_CannotFindSolution;
-    // }
+    return KomoStatus::KS_SolutionFound;
 }
 
-
+///////////////////////////////////////////////////////////////////////
+/// @brief Third level
+/// @param
+///////////////////////////////////////////////////////////////////////
 void 
 KOMO::VerboseSolver(const nlopt::result &result)
 {
@@ -316,30 +329,59 @@ KOMO::VerboseSolver(const nlopt::result &result)
         // Positive messages
         case 1:
             std::cout << "NLOPT status: Generic success return value.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         case 2:
             std::cout << "NLOPT status: Optimization stopped because `stopval` was reached.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         case 3:
             std::cout << "NLOPT status: Optimization stopped because `ftol_rel` or `ftol_abs` was reached.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         case 4:
             std::cout << "NLOPT status: Optimization stopped because `xtol_rel` or `xtol_abs` was reached.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         case 5:
             std::cout << "NLOPT status: Optimization stopped because `maxeval` was reached.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         case 6:
             std::cout << "NLOPT status: Optimization stopped because `maxtime` was reached.\n";
-            std::cout << "EXIT: Optimal Solution Found.\n--------\n";
+            std::cout << "EXIT: Optimal Solution Found.\n--------\n\n";
             break;
         default:
-            std::cout << "result code: " << result << "\n";
+            std::cout << "result code: " << result << "\n\n";
             break;
     }
+}
+
+///////////////////////////////////////////////////////////////////////
+/// @brief Third level
+/// @param
+///////////////////////////////////////////////////////////////////////
+std::vector<double> 
+KOMO::SetInitialGuess(const std::vector<double> &start_state, const std::vector<double> &goal_state)
+{
+    auto q0 = linspace(start_state[0], goal_state[0], 20);
+    auto q1 = linspace(start_state[1], goal_state[1], 20);
+    auto q2 = linspace(start_state[2], goal_state[2], 20);
+    auto q3 = linspace(start_state[3], goal_state[3], 20);
+    auto q4 = linspace(start_state[4], goal_state[4], 20);
+    auto q5 = linspace(start_state[5], goal_state[5], 20);
+    auto q6 = linspace(start_state[6], goal_state[6], 20);
+
+    std::vector<double> init;
+    for (uint i=0; i<20; ++i)
+    {
+        init.push_back(q0[i]);
+        init.push_back(q1[i]);
+        init.push_back(q2[i]);
+        init.push_back(q3[i]);
+        init.push_back(q4[i]);
+        init.push_back(q5[i]);
+        init.push_back(q6[i]);
+    }
+    return init;
 }
