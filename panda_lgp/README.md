@@ -30,25 +30,6 @@ panda_lgp
         
         - Logic -> TODO: not important for now, logic expressions, FoL, maybe tree
 
-TODO:
-    1. MotionROSTools::VisualizeTrajectory -> I do not like vector of vectors as an argument
-    2. Same for MotionROSTools::ExecuteTrajectory
-    
-    3. kinematics::Configuration -> add other variables. I do not know what is useful so far, maybe frames, etc.
-    4. How to extend the dimension of decision variables?
-    5. I added decision variables for each phase, not sure if its the best idea
-    6. KOMO::SetModel() -> have not idea how to make it general
-    7. KOMO::Optimize() -> either differentiate between 2. level or 3. level(by using an argument) or make it general and create separate function that would prepare KOMO for the second level
-        <!-- -> I suggest to use SetModel() to set _model_variable for KOMO (set number of decision variables, boundaries) -->
-    8. Operators are only for simple problem pick&place
-
-
-My idea:
-    1. Define skeleton as a vector of SkeletonEntry
-        1.1. SkeletonEntry -> structure in which you define name of the action and the frames that it concerns
-    2. Thereafter I will call a function that transforms the skeleton vector to:
-        2.1. It should "translate" the Skeleton vector into separate phases with the continuous values (based on the names of the frames) -> basically from Enum and strings to phases structures with exact continous values (maybe separate structure/class for each action)
-    3. Convert these actions into phases so it can be solved with a NLP solver
 
 
 
@@ -63,3 +44,9 @@ Co mam zatial:
     2. priradene data pre constraint
     3. boundaries for decision variables
     4. Init state potrebujem dat
+
+
+Po kade som dosiel
+- 12.10.
+    - napriek tomu ze mam tam tu constraint tak to nejde pre druhu fazu
+    - skus mozno vygenerovat init guess z daneho regionu

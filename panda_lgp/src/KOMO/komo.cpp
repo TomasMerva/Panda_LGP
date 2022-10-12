@@ -165,34 +165,24 @@ KOMO::SecondLevel()
     opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
     // ---- 4. Set constraints ----
-    // const double k_tolerance = 1e-8;
-    const std::vector<double> k_tolerance{1e-3, 1e-3, 1e-3};
     // Set Manipulation frame constraint
-    // std::vector<Constraint::ConstraintData> g_manipulation_frame_data(phases.size()-1);
-    // for (uint i=0; i<g_manipulation_frame_data.size(); ++i)
-    // {
-    //     g_manipulation_frame_data[i].idx = i;
-    //     g_manipulation_frame_data[i].num_phase_variables = x_phase_dim;
-    //     // opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manipulation_frame_data[i], k_tolerance);
-    //     opt.add_equality_mconstraint(Constraint::Test, &g_manipulation_frame_data[i], k_tolerance);
-    // }
-
-
+    const std::vector<double> k_tolerance_manip{1e-6, 1e-6, 1e-6};
     Constraint::ConstraintData g_manip_frame_data;
     g_manip_frame_data.num_phase_variables = x_phase_dim;
     g_manip_frame_data.idx = 0;
-    // opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance);
-    opt.add_equality_mconstraint(Constraint::Test, &g_manip_frame_data, k_tolerance);
+    opt.add_equality_mconstraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance_manip);
+    
 
 
-    // 
-    // for (auto &phase : phases)
-    // {
-    //     for (uint i=0; i<phase.constraints.size(); ++i)
-    //     {
-    //         opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
-    //     }
-    // }
+    const double k_tolerance = 1e-8;
+    for (auto &phase : phases)
+    {
+        for (uint i=0; i<phase.constraints.size(); ++i)
+        {
+            std::cout << phase.constraints[i] << std::endl;
+            opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
+        }
+    }
     
     // ---- 5. Set an initial guess
     std::vector<double> x;
