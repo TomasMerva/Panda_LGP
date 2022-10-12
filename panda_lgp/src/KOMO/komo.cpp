@@ -166,10 +166,24 @@ KOMO::SecondLevel()
 
     // ---- 4. Set constraints ----
     // const double k_tolerance = 1e-8;
+    const std::vector<double> k_tolerance{1e-3, 1e-3, 1e-3};
     // Set Manipulation frame constraint
-    // Constraint::ConstraintData g_manip_frame_data;
-    // g_manip_frame_data.num_phase_variables = x_phase_dim;
+    // std::vector<Constraint::ConstraintData> g_manipulation_frame_data(phases.size()-1);
+    // for (uint i=0; i<g_manipulation_frame_data.size(); ++i)
+    // {
+    //     g_manipulation_frame_data[i].idx = i;
+    //     g_manipulation_frame_data[i].num_phase_variables = x_phase_dim;
+    //     // opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manipulation_frame_data[i], k_tolerance);
+    //     opt.add_equality_mconstraint(Constraint::Test, &g_manipulation_frame_data[i], k_tolerance);
+    // }
+
+
+    Constraint::ConstraintData g_manip_frame_data;
+    g_manip_frame_data.num_phase_variables = x_phase_dim;
+    g_manip_frame_data.idx = 0;
     // opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance);
+    opt.add_equality_mconstraint(Constraint::Test, &g_manip_frame_data, k_tolerance);
+
 
     // 
     // for (auto &phase : phases)

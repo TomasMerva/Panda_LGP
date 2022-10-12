@@ -115,6 +115,18 @@ int main(int argc, char **argv)
     // }
     // std::cout << "\n";
 
+    // const std::vector<double> x{-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 0, 0, 0, 0, 0, 0};
+    // std::vector<double> grad(x.size());
+    // Constraint::ConstraintData g_frame;
+    // g_frame.num_phase_variables = x.size();
+    // auto g = Constraint::ManipulationFrame(x, grad, &g_frame);
+    // std::cout << g << "\n";
+
+    // for (auto gr : grad)
+    // {
+    //     std::cout << gr << " ";
+    // }
+    // std::cout << "\n";
 
     
 

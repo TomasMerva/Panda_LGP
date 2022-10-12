@@ -94,11 +94,18 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.ID = i;
                 phase_i.symbolic_name = "MoveF";
                 // ---- Constraints ----
-                //  1. Be in _grey_region:
+                //  1. Be in region
                 // phase_i.constraints.push_back(Constraint::AxisInRegion);
                 // constraints_data[i].idx = i;
                 // constraints_data[i].num_phase_variables = _x_phase_dim;
-                // constraints_data[i].region = _grey_region;
+                // if (operators[i-1].frames[2] == "grey_region")
+                // {
+                //     constraints_data[i].region = _grey_region; // target region
+                // }
+                // else if (operators[i-1].frames[2] == "red_region")
+                // {
+                //     constraints_data[i].region = _red_region; // target region
+                // }                
                 // phase_i.constraints_data.push_back(constraints_data[i]);
                 // ---- Boundaries ----
                 SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
@@ -113,12 +120,19 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.ID = i;
                 phase_i.symbolic_name = "MoveH";
                 // ---- Constraints ----
-                // //  1. Be in _red_region:
+                //  1. Be in region
                 // phase_i.constraints.push_back(Constraint::AxisInRegion);
                 // constraints_data[i].idx = i;
                 // constraints_data[i].num_phase_variables = _x_phase_dim;
-                // constraints_data[i].region = _red_region;
-                // phase_i.constraints_data.push_back(constraints_data[i]);
+                // if (operators[i-1].frames[3] == "grey_region")
+                // {
+                //     constraints_data[i].region = _grey_region; // target region
+                // }
+                // else if (operators[i-1].frames[3] == "red_region")
+                // {
+                //     constraints_data[i].region = _red_region; // target region
+                // }              
+                // phase_i.constraints_data.push_back(constraints_data[i]);  
                 // ---- Boundaries ----
                 SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
                 // ---- Init guess ----
