@@ -45,13 +45,11 @@ class KOMO : public MotionROSTools
             uint ID;
             std::string symbolic_name;
             uint num_time_slices;
-            // std::vector<ConstraintSymbol> constraints;
-            // std::vector<std::function<double(const std::vector<double> &x, std::vector<double> &grad, void *data)>> constraints;
             std::vector<nlopt::vfunc> constraints;
             std::vector<Constraint::ConstraintData> constraints_data;
             std::vector<double> x;
             std::vector<double> x_init;
-            std::vector<std::vector<double>> q_trajectory;
+            std::vector<std::vector<double>> q_trajectory;  // trajectory from this phase to the next phase
             std::vector<double> lower_bounds;
             std::vector<double> upper_bounds;
         };

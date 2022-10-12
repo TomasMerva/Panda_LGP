@@ -139,20 +139,20 @@ KOMO::SecondLevel()
     uint x_phase_dim = 7 + 6; //q(7) + 6DoF (manipulation frame)
 
     // ---- 1. Choose solver and set decision variables LD_TNEWTON_PRECOND_RESTART ----
-    nlopt::opt opt(nlopt::algorithm::AUGLAG, phases.size()*x_phase_dim);
-    nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, phases.size()*x_phase_dim);
-    // opt.set_xtol_rel(1e-6);
-    // opt.set_xtol_abs(1e-6);  
+    nlopt::opt opt(nlopt::algorithm::AUGLAG, (phases.size()-1)*x_phase_dim);
+    nlopt::opt local_opt(nlopt::algorithm::LD_TNEWTON_PRECOND_RESTART, (phases.size()-1)*x_phase_dim);
+    opt.set_xtol_rel(1e-6);
+    opt.set_xtol_abs(1e-6);  
     opt.set_local_optimizer(local_opt);
 
     // ---- 2. Set boundaries ----
     // - convert boundaries from all phases into one vector
     std::vector<double> lower_bounds;
     std::vector<double> upper_bounds;
-    for (auto &phase : phases)
+    for (uint idx=1; idx<phases.size(); ++idx)
     {
-        lower_bounds.insert(lower_bounds.end(), phase.lower_bounds.begin(), phase.lower_bounds.end());
-        upper_bounds.insert(upper_bounds.end(), phase.upper_bounds.begin(), phase.upper_bounds.end());
+        lower_bounds.insert(lower_bounds.end(), phases[idx].lower_bounds.begin(), phases[idx].lower_bounds.end());
+        upper_bounds.insert(upper_bounds.end(), phases[idx].upper_bounds.begin(), phases[idx].upper_bounds.end());
     }
     opt.set_lower_bounds(lower_bounds);
     opt.set_upper_bounds(upper_bounds);
@@ -160,16 +160,16 @@ KOMO::SecondLevel()
     // ---- 3. Set objective function ----
     KOMO_k2::ObjectiveData objective;
     objective.num_phase_variables = x_phase_dim;
-    objective.num_phases = phases.size();
+    objective.num_phases = phases.size()-1;
     objective.num_iterations = 0;
     opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
     // ---- 4. Set constraints ----
-    const double k_tolerance = 1e-8;
+    // const double k_tolerance = 1e-8;
     // Set Manipulation frame constraint
-    Constraint::ConstraintData g_manip_frame_data;
-    g_manip_frame_data.num_phase_variables = x_phase_dim;
-    opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance);
+    // Constraint::ConstraintData g_manip_frame_data;
+    // g_manip_frame_data.num_phase_variables = x_phase_dim;
+    // opt.add_equality_constraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance);
 
     // 
     // for (auto &phase : phases)
@@ -182,11 +182,11 @@ KOMO::SecondLevel()
     
     // ---- 5. Set an initial guess
     std::vector<double> x;
-    for (auto &phase : phases)
+    for (uint idx=1; idx<phases.size(); ++idx)
     {
-        x.insert(x.end(), phase.x_init.begin(), phase.x_init.end());
+        x.insert(x.end(), phases[idx].x_init.begin(), phases[idx].x_init.end());
     }
-    
+
     // ---- 6. Optimize
     double min_obj_value;
     auto start_time = high_resolution_clock::now();
@@ -203,9 +203,9 @@ KOMO::SecondLevel()
         // Convert to phases
         uint begin = 0;
         uint end = objective.num_phase_variables;
-        for (auto &phase : phases)
+        for (uint idx=1; idx<phases.size(); ++idx)
         {
-            phase.x.insert(phase.x.begin(), x.begin()+begin, x.begin()+end);
+            phases[idx].x.insert(phases[idx].x.begin(), x.begin()+begin, x.begin()+end);
             begin = end;
             end += end;
         }
@@ -272,6 +272,7 @@ KOMO::ThirdLevel()
         // ---- 3. Set objective function ----
         KOMO_k2::ObjectiveData objective;
         objective.num_phase_variables = x_phase_dim;
+        objective.num_phases = 20; // 20 timesteps between two points
         objective.num_iterations = 0;
         opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
@@ -318,8 +319,8 @@ KOMO::ThirdLevel()
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// @brief Third level
-/// @param
+/// @brief Translates nlopt code into message
+/// @param result Return value from optimize()
 ///////////////////////////////////////////////////////////////////////
 void 
 KOMO::VerboseSolver(const nlopt::result &result)
@@ -358,8 +359,9 @@ KOMO::VerboseSolver(const nlopt::result &result)
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// @brief Third level
-/// @param
+/// @brief Initial guess as linspace from start to goal
+/// @param start_state
+/// @param goal_state
 ///////////////////////////////////////////////////////////////////////
 std::vector<double> 
 KOMO::SetInitialGuess(const std::vector<double> &start_state, const std::vector<double> &goal_state)

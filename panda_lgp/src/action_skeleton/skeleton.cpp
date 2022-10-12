@@ -4,7 +4,7 @@ namespace logic
 {
 
 Skeleton::Skeleton()
-    : _x_phase_dim(7+6+3) // q(7) + 6DoF(man_frame) + [x,y,z] cube = 16
+    : _x_phase_dim(7+6) // q(7) + 6DoF(man_frame)
 {
     // This is only range in y coordinate
     _grey_region = {-0.5, 0.2};
@@ -21,7 +21,7 @@ Skeleton::Skeleton()
 
 
 Skeleton::Skeleton(std::vector<SkeletonEntry> op)
-    : _x_phase_dim(7+6+3) // q(7) + 6DoF(man_frame) + [x,y,z] cube = 16
+    : _x_phase_dim(7+6) // q(7) + 6DoF(man_frame)
 {
     operators = op;
 
@@ -60,7 +60,7 @@ Skeleton::SetInitGuessForPhase(KOMO *komo, std::vector<double> &phase_x_init)
     std::vector<double> manipulation_frame(6, 0);
     phase_x_init.insert(phase_x_init.end(), manipulation_frame.begin(), manipulation_frame.end());
     // Add object coordinates as init
-    phase_x_init.insert(phase_x_init.end(), _cube_pos.begin(), _cube_pos.end());
+    // phase_x_init.insert(phase_x_init.end(), _cube_pos.begin(), _cube_pos.end());
 }
 
 
