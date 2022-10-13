@@ -8,7 +8,7 @@ Skeleton::Skeleton()
 {
     // This is only range in y coordinate
     _grey_region = {-0.5, 0.2};
-    _red_region = {0.2, 0.5};
+    _red_region = {0.15, 0.5};
 
     // The cube position [x,y,z]
     _cube_frame << 1, 0, 0, 0.4,
@@ -26,7 +26,7 @@ Skeleton::Skeleton(std::vector<SkeletonEntry> op)
     operators = op;
 
     // This is only range in y coordinate
-    _grey_region = {-0.5, 0.2};
+    _grey_region = {-0.5, 0.15};
     _red_region = {0.2, 0.5};
 
     // The cube position [x,y,z]
@@ -96,7 +96,7 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.symbolic_name = "MoveF";
                 // ---- Constraints ----
                 //  1. Be in region
-                phase_i.constraints.push_back(Constraint::AxisInRegion);
+                // phase_i.constraints.push_back(Constraint::AxisInRegion);
                 Constraint::ConstraintData data_AxisInRegion;
                 data_AxisInRegion.idx = i-1;
                 data_AxisInRegion.num_phase_variables = _x_phase_dim;
@@ -124,7 +124,7 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.symbolic_name = "MoveH";
                 // ---- Constraints ----
                 //  1. Be in region
-                phase_i.constraints.push_back(Constraint::AxisInRegion);
+                // phase_i.constraints.push_back(Constraint::AxisInRegion);
                 Constraint::ConstraintData data_AxisInRegion;
                 data_AxisInRegion.idx = i-1;
                 data_AxisInRegion.num_phase_variables = _x_phase_dim;

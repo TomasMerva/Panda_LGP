@@ -30,7 +30,7 @@ void
 Constraint::ManipulationFrame(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data)
 {
     Constraint::ConstraintData *g_data = reinterpret_cast<Constraint::ConstraintData*>(f_data);
-    Eigen::Map<const Eigen::VectorXd> q(x, 13);
+    Eigen::Map<const Eigen::VectorXd> q(x+ g_data->idx*g_data->num_phase_variables, g_data->num_phase_variables);
     auto kin_conf = kinematics::GeometricJacobian(q, true);
     Eigen::MatrixXd J = kin_conf[0];
     Eigen::MatrixXd FK = kin_conf[1];

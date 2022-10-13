@@ -31,9 +31,10 @@ typedef struct
 
 
 // Constraints
-double AxisInRegion(const std::vector<double> &x, std::vector<double> &grad, void *data);
+// double AxisInRegion(const std::vector<double> &x, std::vector<double> &grad, void *data);
 // double ManipulationFrame(const std::vector<double> &x, std::vector<double> &grad, void *data);
 void ManipulationFrame(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data);
+void AxisInRegion(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data);
 
 // Add Constraint Data for skeleton
 // ConstraintData AddAxisInRegionData(uint idx, std::string region);

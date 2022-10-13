@@ -47,34 +47,31 @@ int main(int argc, char **argv)
     //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
     //     logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
     // });
-    logic::Skeleton S({
-        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
-        logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
-    });
+    // logic::Skeleton S({
+    //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
+    //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
+    // });
 
-    S.SetKOMO(&komo);
-    KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
-
-
-
-    if (komo_status == KomoStatus::KS_SolutionFound)
-    {
-        for (auto const phase : komo.phases)
-        {
-            std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
-            for (auto const x_phase : phase.x)
-            {
-                std::cout << x_phase << "      ";
-            }
-            std::cout << "]\n";
-            auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
-            std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
-        }
-    }
-    else
-    {
-        std::cout << "No solution has been found" << std::endl;
-    }
+    // S.SetKOMO(&komo);
+    // KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
+    // if (komo_status == KomoStatus::KS_SolutionFound)
+    // {
+    //     for (auto const phase : komo.phases)
+    //     {
+    //         std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
+    //         for (auto const x_phase : phase.x)
+    //         {
+    //             std::cout << x_phase << "      ";
+    //         }
+    //         std::cout << "]\n";
+    //         auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
+    //         std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
+    //     }
+    // }
+    // else
+    // {
+    //     std::cout << "No solution has been found" << std::endl;
+    // }
 
 
 
@@ -102,10 +99,10 @@ int main(int argc, char **argv)
 
     // const std::vector<double> x{-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 
     //                             -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08,
-    //                             0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019,
-    //                             0.596, 0., 0., -2, 0.06, 1.53, 1.019,
-    //                             -1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,
-    //                              -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08};
+    //                             0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019};
+    // //                             0.596, 0., 0., -2, 0.06, 1.53, 1.019,
+    // //                             -1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,
+    // //                              -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08};
     // std::vector<double> jac(x.size());
     // KOMO_k2::FillJacobianBlock(x, jac, 7, 6);
 
@@ -115,11 +112,15 @@ int main(int argc, char **argv)
     // }
     // std::cout << "\n";
 
-    // const std::vector<double> x{-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 0, 0, 0, 0, 0, 0};
+    // const std::vector<double> x{-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 0, 2, 0, 0, 0, 0};
     // std::vector<double> grad(x.size());
-    // Constraint::ConstraintData g_frame;
-    // g_frame.num_phase_variables = x.size();
-    // auto g = Constraint::ManipulationFrame(x, grad, &g_frame);
+    // Constraint::ConstraintData g_data;
+    // g_data.num_phase_variables = x.size();
+    // g_data.idx = 0;
+    // std::vector<double> grey_region = {-0.5, 0.2};
+    // std::vector<double> red_region = {0.2, 0.5};
+    // g_data.region = grey_region;
+    // auto g = Constraint::AxisInRegion(x, grad, &g_data);
     // std::cout << g << "\n";
 
     // for (auto gr : grad)
@@ -128,7 +129,25 @@ int main(int argc, char **argv)
     // }
     // std::cout << "\n";
 
-    
+
+    double x[26] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,  0, 0, 0, 0, 0, 0
+                    -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0};
+    double grad[26*2];
+
+    Constraint::ConstraintData g_data;
+    g_data.idx=1;
+    g_data.num_phase_variables = 13;
+    uint m = 2;
+    uint n = 26;
+    double result[2];
+    Constraint::AxisInRegion(m, &result[0], n, &x[0], &grad[0], &g_data);
+    for (uint i=0; i<2; i++)
+    {
+        std::cout << result[i] << " ";
+    }
+    std::cout << std::endl;
+
+
 
     ros::waitForShutdown();
     return 0;

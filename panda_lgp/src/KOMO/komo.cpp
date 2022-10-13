@@ -166,23 +166,35 @@ KOMO::SecondLevel()
 
     // ---- 4. Set constraints ----
     // Set Manipulation frame constraint
-    const std::vector<double> k_tolerance_manip{1e-6, 1e-6, 1e-6};
-    Constraint::ConstraintData g_manip_frame_data;
-    g_manip_frame_data.num_phase_variables = x_phase_dim;
-    g_manip_frame_data.idx = 0;
-    opt.add_equality_mconstraint(Constraint::ManipulationFrame, &g_manip_frame_data, k_tolerance_manip);
+    // const std::vector<double> k_tolerance_manip{1e-6, 1e-6, 1e-6};
+    // std::vector<Constraint::ConstraintData> g_manipulation_frame(phases.size()-1);
+    // for (uint i=1; i<phases.size(); ++i)
+    // {
+    //     g_manipulation_frame[i-1].idx = i-1;
+    //     g_manipulation_frame[i-1].num_phase_variables = x_phase_dim;
+    //     opt.add_equality_mconstraint(Constraint::ManipulationFrame, &g_manipulation_frame[i-1], k_tolerance_manip);
+    // }
     
+    const std::vector<double> k_tolerance_manip{1e-6, 1e-6};
+    opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[1].constraints_data[0], k_tolerance_manip);
+    opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[2].constraints_data[0], k_tolerance_manip);
+
+    //const double k_tolerance = 1e-8;
+    // _grey_region = {-0.5, 0.2};
+    // _red_region = {0.15, 0.5};
+    // opt.add_inequality_constraint(phases[1].constraints[0], &phases[1].constraints_data[0], k_tolerance);
+    // opt.add_inequality_constraint(phases[2].constraints[0], &phases[2].constraints_data[0], k_tolerance);
 
 
-    const double k_tolerance = 1e-8;
-    for (auto &phase : phases)
-    {
-        for (uint i=0; i<phase.constraints.size(); ++i)
-        {
-            std::cout << phase.constraints[i] << std::endl;
-            opt.add_inequality_constraint(phase.constraints[i], &phase.constraints_data[i], k_tolerance);
-        }
-    }
+    // opt.add_inequality_constraint(phases[2].constraints[0], &phases[2].constraints_data[0], k_tolerance);
+
+    // for (uint i=1; i<phases.size(); ++i)
+    // {
+    //     for (uint j=0; j<phases[i].constraints.size(); ++j)
+    //     {
+    //         opt.add_inequality_constraint(phases[i].constraints[j], &phases[i].constraints_data[j], k_tolerance);
+    //     }
+    // }
     
     // ---- 5. Set an initial guess
     std::vector<double> x;
@@ -190,6 +202,8 @@ KOMO::SecondLevel()
     {
         x.insert(x.end(), phases[idx].x_init.begin(), phases[idx].x_init.end());
     }
+    x[8] = 5;
+    x[8+13] = -5;
 
     // ---- 6. Optimize
     double min_obj_value;
