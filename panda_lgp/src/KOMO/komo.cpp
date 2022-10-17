@@ -175,26 +175,27 @@ KOMO::SecondLevel()
     //     opt.add_equality_mconstraint(Constraint::ManipulationFrame, &g_manipulation_frame[i-1], k_tolerance_manip);
     // }
     
-    const std::vector<double> k_tolerance_manip{1e-6, 1e-6};
-    opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[1].constraints_data[0], k_tolerance_manip);
-    opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[2].constraints_data[0], k_tolerance_manip);
+    // opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[1].constraints_data[0], k_tolerance_manip);
+    // opt.add_inequality_mconstraint(Constraint::AxisInRegion, &phases[3].constraints_data[0], k_tolerance_manip);
 
     //const double k_tolerance = 1e-8;
     // _grey_region = {-0.5, 0.2};
     // _red_region = {0.15, 0.5};
-    // opt.add_inequality_constraint(phases[1].constraints[0], &phases[1].constraints_data[0], k_tolerance);
+    // opt.add_inequality_mconstraint(phases[1].constraints[0], &phases[1].constraints_data[0], k_tolerance_manip);
+    // opt.add_inequality_mconstraint(phases[1].constraints[0], &phases[1].constraints_data[0], k_tolerance_manip);
+
     // opt.add_inequality_constraint(phases[2].constraints[0], &phases[2].constraints_data[0], k_tolerance);
 
-
     // opt.add_inequality_constraint(phases[2].constraints[0], &phases[2].constraints_data[0], k_tolerance);
 
-    // for (uint i=1; i<phases.size(); ++i)
-    // {
-    //     for (uint j=0; j<phases[i].constraints.size(); ++j)
-    //     {
-    //         opt.add_inequality_constraint(phases[i].constraints[j], &phases[i].constraints_data[j], k_tolerance);
-    //     }
-    // }
+    const std::vector<double> k_tolerance_manip{1e-6, 1e-6};
+    for (uint i=1; i<phases.size(); ++i)
+    {
+        for (uint g_i=0; g_i<phases[i].constraints.size(); ++g_i)
+        {
+            opt.add_inequality_mconstraint(phases[i].constraints[g_i], &phases[i].constraints_data[g_i], k_tolerance_manip);
+        }
+    }
     
     // ---- 5. Set an initial guess
     std::vector<double> x;
@@ -202,8 +203,6 @@ KOMO::SecondLevel()
     {
         x.insert(x.end(), phases[idx].x_init.begin(), phases[idx].x_init.end());
     }
-    x[8] = 5;
-    x[8+13] = -5;
 
     // ---- 6. Optimize
     double min_obj_value;
@@ -220,12 +219,12 @@ KOMO::SecondLevel()
         VerboseSolver(result);
         // Convert to phases
         uint begin = 0;
-        uint end = objective.num_phase_variables;
+        uint end = x_phase_dim;
         for (uint idx=1; idx<phases.size(); ++idx)
         {
-            phases[idx].x.insert(phases[idx].x.begin(), x.begin()+begin, x.begin()+end);
+            phases[idx].x.insert(phases[idx].x.end(), x.begin()+begin, x.begin()+end);
             begin = end;
-            end += end;
+            end += x_phase_dim;
         }
         return KomoStatus::KS_SolutionFound;
     }
@@ -404,4 +403,43 @@ KOMO::SetInitialGuess(const std::vector<double> &start_state, const std::vector<
         init.push_back(q6[i]);
     }
     return init;
+}
+
+
+std::ostream& operator<< (std::ostream& out, const KOMO& obj)
+{
+    out << "--- KOMO structure ---\n";
+    for (uint idx=0; idx<obj.phases.size(); ++idx)
+    {
+        out << "Phase " << obj.phases[idx].ID << ": " << obj.phases[idx].symbolic_name << "\n";
+        // X init
+        out << "  x_dim: " << obj.phases[idx].x_init.size() << "\n";
+        Eigen::Map<const Eigen::VectorXd> temp_x_init(obj.phases[idx].x_init.data(), obj.phases[idx].x_init.size());
+        out << "  x_init: " << temp_x_init.transpose() << "\n";
+        // Boundaries
+        Eigen::Map<const Eigen::VectorXd> temp_x_lb(obj.phases[idx].lower_bounds.data(), obj.phases[idx].lower_bounds.size());
+        Eigen::Map<const Eigen::VectorXd> temp_x_ub(obj.phases[idx].upper_bounds.data(), obj.phases[idx].upper_bounds.size());
+        out << "  lb: " << temp_x_lb.transpose() << "\n";
+        out << "  ub: " << temp_x_ub.transpose() << "\n";
+
+
+
+        // Print constraints
+        out << "  Constraints:\n";
+        for (uint g_idx=0; g_idx < obj.phases[idx].constraints.size(); ++g_idx)
+        {
+            if (obj.phases[idx].constraints[g_idx] == Constraint::AxisInRegion)
+            {
+                out << "    g"<< g_idx << ": AxisInRegion\n";
+                out << "    g"<< g_idx << "_data: {idx:" << obj.phases[idx].constraints_data[g_idx].idx <<
+                                  ", num_phase_var: " << obj.phases[idx].constraints_data[g_idx].num_phase_variables <<
+                                  ", region: [" << obj.phases[idx].constraints_data[g_idx].region[0] << ", " << obj.phases[idx].constraints_data[g_idx].region[1] <<
+                                  "]}\n";
+            }
+        }
+
+        out << "\n";
+    }
+    out << "----------------------\n";
+    return out;
 }

@@ -7,8 +7,8 @@ Skeleton::Skeleton()
     : _x_phase_dim(7+6) // q(7) + 6DoF(man_frame)
 {
     // This is only range in y coordinate
-    _grey_region = {-0.5, 0.2};
-    _red_region = {0.15, 0.5};
+    _grey_region = {-0.5+0.05, 0.2-0.05};   //cube size
+    _red_region = {0.2+0.05, 0.5-0.05};
 
     // The cube position [x,y,z]
     _cube_frame << 1, 0, 0, 0.4,
@@ -26,8 +26,8 @@ Skeleton::Skeleton(std::vector<SkeletonEntry> op)
     operators = op;
 
     // This is only range in y coordinate
-    _grey_region = {-0.5, 0.15};
-    _red_region = {0.2, 0.5};
+    _grey_region = {-0.5+0.05, 0.2-0.05};   //cube size
+    _red_region = {0.2+0.05, 0.5-0.05};
 
     // The cube position [x,y,z]
     _cube_frame << 1, 0, 0, 0.4,
@@ -96,7 +96,7 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.symbolic_name = "MoveF";
                 // ---- Constraints ----
                 //  1. Be in region
-                // phase_i.constraints.push_back(Constraint::AxisInRegion);
+                phase_i.constraints.push_back(Constraint::AxisInRegion);
                 Constraint::ConstraintData data_AxisInRegion;
                 data_AxisInRegion.idx = i-1;
                 data_AxisInRegion.num_phase_variables = _x_phase_dim;
@@ -124,7 +124,7 @@ Skeleton::SetKOMO(KOMO *komo)
                 phase_i.symbolic_name = "MoveH";
                 // ---- Constraints ----
                 //  1. Be in region
-                // phase_i.constraints.push_back(Constraint::AxisInRegion);
+                phase_i.constraints.push_back(Constraint::AxisInRegion);
                 Constraint::ConstraintData data_AxisInRegion;
                 data_AxisInRegion.idx = i-1;
                 data_AxisInRegion.num_phase_variables = _x_phase_dim;
@@ -137,6 +137,38 @@ Skeleton::SetKOMO(KOMO *komo)
                     data_AxisInRegion.region = _red_region; // target region
                 }                
                 phase_i.constraints_data.push_back(data_AxisInRegion); 
+                // ---- Boundaries ----
+                SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
+                // ---- Init guess ----
+                SetInitGuessForPhase(komo, phase_i.x_init);
+                // Add phase to the vector
+                komo->phases.push_back(phase_i);
+                break;
+            }
+            case SkeletonAction::Pick:
+            {
+                // ---- General info ----
+                phase_i.ID = i;
+                phase_i.symbolic_name = "Pick";
+                // ---- Constraints ----
+                // data_AxisInRegion.idx = i-1;
+                // data_AxisInRegion.num_phase_variables = _x_phase_dim;
+                // ---- Boundaries ----
+                SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
+                // ---- Init guess ----
+                SetInitGuessForPhase(komo, phase_i.x_init);
+                // Add phase to the vector
+                komo->phases.push_back(phase_i);
+                break;
+            }
+            case SkeletonAction::Place:
+            {
+                // ---- General info ----
+                phase_i.ID = i;
+                phase_i.symbolic_name = "Place";
+                // ---- Constraints ----
+                // data_AxisInRegion.idx = i-1;
+                // data_AxisInRegion.num_phase_variables = _x_phase_dim;
                 // ---- Boundaries ----
                 SetBoundariesForPhase(komo, phase_i.lower_bounds, phase_i.upper_bounds);
                 // ---- Init guess ----

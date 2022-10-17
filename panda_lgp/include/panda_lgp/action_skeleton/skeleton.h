@@ -28,6 +28,7 @@ class Skeleton
 
         std::vector<SkeletonEntry> operators;   // TODO: change to private
 
+
     private:
         void SetBoundariesForPhase(KOMO *komo, std::vector<double> &lb, std::vector<double> &ub);
         void SetInitGuessForPhase(KOMO *komo, std::vector<double> &phase_x_init);

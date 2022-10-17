@@ -41,37 +41,39 @@ int main(int argc, char **argv)
     // std::cout << "\n";
     //     // komo.SetModel(robot_config, LgpLevel::SECOND_LEVEL);
 
-    // logic::Skeleton S({
-    //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
-    //     logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
-    //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
-    //     logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
-    // });
+    logic::Skeleton S({
+        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
+        logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
+        logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
+        logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
+    });
     // logic::Skeleton S({
     //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
     //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
     // });
 
-    // S.SetKOMO(&komo);
-    // KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
-    // if (komo_status == KomoStatus::KS_SolutionFound)
-    // {
-    //     for (auto const phase : komo.phases)
-    //     {
-    //         std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
-    //         for (auto const x_phase : phase.x)
-    //         {
-    //             std::cout << x_phase << "      ";
-    //         }
-    //         std::cout << "]\n";
-    //         auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
-    //         std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
-    //     }
-    // }
-    // else
-    // {
-    //     std::cout << "No solution has been found" << std::endl;
-    // }
+    S.SetKOMO(&komo);
+    std::cout << komo << std::endl;
+
+    KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
+    if (komo_status == KomoStatus::KS_SolutionFound)
+    {
+        for (auto const phase : komo.phases)
+        {
+            std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
+            for (auto const x_phase : phase.x)
+            {
+                std::cout << x_phase << "      ";
+            }
+            std::cout << "]\n";
+            auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
+            std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
+        }
+    }
+    else
+    {
+        std::cout << "No solution has been found" << std::endl;
+    }
 
 
 
@@ -130,22 +132,31 @@ int main(int argc, char **argv)
     // std::cout << "\n";
 
 
-    double x[26] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,  0, 0, 0, 0, 0, 0
-                    -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0};
-    double grad[26*2];
+    // double x[26] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,  0, 0, 0, 0, 0, 0,
+    //                 -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0};
+    // double grad[26*2];
 
-    Constraint::ConstraintData g_data;
-    g_data.idx=1;
-    g_data.num_phase_variables = 13;
-    uint m = 2;
-    uint n = 26;
-    double result[2];
-    Constraint::AxisInRegion(m, &result[0], n, &x[0], &grad[0], &g_data);
-    for (uint i=0; i<2; i++)
-    {
-        std::cout << result[i] << " ";
-    }
-    std::cout << std::endl;
+    // Constraint::ConstraintData g_data;
+    // g_data.idx=1;
+    // g_data.num_phase_variables = 13;
+    // g_data.region = std::vector<double>{-0.5, 0.2};
+    // uint m = 2;
+    // uint n = 26;
+    // double result[2];
+    // Constraint::AxisInRegion(m, &result[0], n, &x[0], &grad[0], &g_data);
+    // for (uint i=0; i<2; i++)
+    // {
+    //     std::cout << result[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // std::cout << "\ngrad" << std::endl;
+
+    // for (uint i=0; i<m*n; ++i)
+    // {
+    //     std::cout << grad[i] << " ";
+    //     if (i==n) std::cout << "\n\n";
+    // }
+    // std::cout << std::endl;
 
 
 

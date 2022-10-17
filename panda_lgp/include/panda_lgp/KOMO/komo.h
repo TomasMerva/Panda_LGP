@@ -39,13 +39,15 @@ class KOMO : public MotionROSTools
 
         void AddJointLimits(std::vector<double> &lower_bounds, std::vector<double> &upper_bounds);
 
+        friend std::ostream& operator<< (std::ostream& out, const KOMO& obj); 
+
 
         struct Phase
         {
             uint ID;
             std::string symbolic_name;
-            uint num_time_slices;
-            std::vector<nlopt::vfunc> constraints;
+            uint num_time_slices; // maybe delete
+            std::vector<nlopt::mfunc> constraints;
             std::vector<Constraint::ConstraintData> constraints_data;
             std::vector<double> x;
             std::vector<double> x_init;
@@ -95,3 +97,4 @@ std::vector<double> linspace(T start_in, T end_in, int num_in)
                             // are exactly the same as the input
   return linspaced;
 }
+
