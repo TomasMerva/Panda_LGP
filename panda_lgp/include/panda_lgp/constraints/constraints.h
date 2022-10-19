@@ -36,6 +36,10 @@ typedef struct
 void ManipulationFrame(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data);
 void AxisInRegion(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data);
 
+
+void Zaxis(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data);
+
+
 // Add Constraint Data for skeleton
 // ConstraintData AddAxisInRegionData(uint idx, std::string region);
 

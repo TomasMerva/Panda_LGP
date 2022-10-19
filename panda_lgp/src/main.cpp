@@ -20,81 +20,75 @@ int main(int argc, char **argv)
     // num_phases, time slices, seconds for traj, k-order
     // komo.SetTiming(4, 20, 5, 2);
 
-
-
-
-    // komo.AddConstraint({1, 2}, ConstraintSymbol::FS_PointToPointDistance);
-    // komo.AddConstraint({2}, ConstraintSymbol::FS_FixedOrientationAxis);
-    // komo.ClearConstraint({1});
-    // // TODO: AddObjective(const std::vector<uint> phases_ID, Objective_ENUM)
-
-
-    // for (auto phase : komo.phases)
-    // {
-    //     std::cout << "Phase " << phase.ID << ":\t";
-    //     for (auto g : phase.constraints)
-    //     {
-    //         std::cout << "constraint: " << g << "\t";
-    //     }
-    //     std::cout << "\n";
-    // }
-    // std::cout << "\n";
-    //     // komo.SetModel(robot_config, LgpLevel::SECOND_LEVEL);
-
-    logic::Skeleton S({
-        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
-        logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
-        logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
-        logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
-    });
     // logic::Skeleton S({
     //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
+    //     logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
     //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
+    //     logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
     // });
+    logic::Skeleton S({
+        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"})    
+    });
 
     S.SetKOMO(&komo);
-    std::cout << komo << std::endl;
+    // std::cout << komo << std::endl;
 
-    KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
-    if (komo_status == KomoStatus::KS_SolutionFound)
-    {
-        for (auto const phase : komo.phases)
-        {
-            std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
-            for (auto const x_phase : phase.x)
-            {
-                std::cout << x_phase << "      ";
-            }
-            std::cout << "]\n";
-            auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
-            std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
-        }
-    }
-    else
-    {
-        std::cout << "No solution has been found" << std::endl;
-    }
-
-
-
-    // // // just to test 3.level
-    // komo.phases[1].x = std::vector<double>{-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 0, 0, 0, 0, 0, 0};
-    // komo.phases[2].x = std::vector<double>{-0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0};
-    // KomoStatus komo_status = komo.Optimize(LgpLevel::THIRD_LEVEL);
+    // KomoStatus komo_status = komo.Optimize(LgpLevel::SECOND_LEVEL);
     // if (komo_status == KomoStatus::KS_SolutionFound)
     // {
     //     for (auto const phase : komo.phases)
     //     {
-    //         for (auto t_q : phase.q_trajectory)
+    //         std::cout << "----- Action:  " << phase.symbolic_name << " -----\n[";
+    //         for (auto const x_phase : phase.x)
     //         {
-    //             for (auto q: t_q)
-    //             {
-    //                 std::cout << q << "   ";
-    //             }
-    //             std::cout << "\n\n";
+    //             std::cout << x_phase << "      ";
     //         }
+    //         std::cout << "]\n";
+    //         auto FK = kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(phase.x.data(), phase.x.size()), true);
+    //         std::cout << "EEF[x,y,z] = [" << FK(0,3) << " " << FK(1,3) << " " << FK(2,3) << "]\n\n";
     //     }
     // }
+    // else
+    // {
+    //     std::cout << "No solution has been found" << std::endl;
+    // }
+
+    // just to test 3.level
+    komo.phases[1].x = std::vector<double>{-1.2116, 0.356153, 0.244033, -2.28525, -1.68591, 2.35773, 4.035e-08};
+    // komo.phases[2].x = std::vector<double>{-1.06086, 0.436372, 0.461309, -2.32378, -1.67167, 2.46085, 4.035e-08};
+    // komo.phases[3].x = std::vector<double>{-0.747309, 0.356153, 0.908409, -2.42052, -1.6404, 2.67201, 4.035e-08};
+    // komo.phases[4].x = std::vector<double>{-0.507423, 1.26222, 1.34696, -2.40899, -1.60368, 2.87996, 4.035e-08};    
+    KomoStatus komo_status = komo.Optimize(LgpLevel::THIRD_LEVEL);
+    if (komo_status == KomoStatus::KS_SolutionFound)
+    {
+        ros::Duration(5).sleep();
+
+        std_msgs::ColorRGBA marker_color;
+        marker_color.g = 1;
+        marker_color.a = 1;
+        komo.VisualizeTrajectory(komo.phases[0].q_trajectory, marker_color, 0);
+
+        marker_color.g = 0;
+        marker_color.r = 1;
+        marker_color.a = 1;
+        komo.VisualizeTrajectory(komo.phases[1].q_trajectory, marker_color, 1);
+
+        marker_color.g = 0;
+        marker_color.b = 1;
+        marker_color.r = 0;
+        marker_color.a = 1;
+        komo.VisualizeTrajectory(komo.phases[2].q_trajectory, marker_color, 2);
+
+        marker_color.g = 1;
+        marker_color.b = 1;
+        marker_color.r = 0;
+        marker_color.a = 1;
+        komo.VisualizeTrajectory(komo.phases[3].q_trajectory, marker_color, 3);
+    }
+    else 
+    {
+        ROS_ERROR("No solution has been found");
+    }
 
 
 
@@ -131,18 +125,20 @@ int main(int argc, char **argv)
     // }
     // std::cout << "\n";
 
-
-    // double x[26] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,  0, 0, 0, 0, 0, 0,
-    //                 -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0};
-    // double grad[26*2];
+    // uint m = 1;
+    // uint n = 13*4;
+    // double x[n] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08, 0, 0, 0, 0, 0, 0,
+    //                 -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08, 0, 0, 0, 0, 0, 0,
+    //                 0.096,   0.308,    0.646,    -2.249,   0.06,     2.53,    2.019,        0, 0, 0, 0, 0, 0,
+    //                 0.596,   0.,       0.,       -2,       0.06,     1.53,    1.019,        0, 0, 0, 0, 0, 0};
+    // double grad[n*m];
 
     // Constraint::ConstraintData g_data;
-    // g_data.idx=1;
+    // g_data.idx=0;
     // g_data.num_phase_variables = 13;
     // g_data.region = std::vector<double>{-0.5, 0.2};
-    // uint m = 2;
-    // uint n = 26;
-    // double result[2];
+   
+    // double result[m];
     // Constraint::AxisInRegion(m, &result[0], n, &x[0], &grad[0], &g_data);
     // for (uint i=0; i<2; i++)
     // {
@@ -159,6 +155,42 @@ int main(int argc, char **argv)
     // std::cout << std::endl;
 
 
+    // uint timesteps = 4;
+    // uint m = timesteps;
+    // uint n = 7*timesteps;
+    // double x[n] = {-1.01003, 0.619206, -0.0457302, -2.07182, -1.69616, 2.20528, -8.00068e-08,
+    //                 -0.490178, 1.10071, 0.748854, -2.19579, -1.67757, 2.41694, -8.00068e-08,
+    //                 -0.747309, 0.906277, 0.908409, -2.42052, -1.6404, 2.67201, 4.035e-08,
+    //                 -0.507423, 1.26222, 1.34696, -2.40899, -1.60368, 2.87996, 4.035e-08};
+    // double grad[n*m];
+    // const std::vector<double> k_tolerance(timesteps, 1e-6);
+    // Constraint::ConstraintData g_data;
+    // g_data.num_phase_variables = 7;
+    // double result[m];
+
+
+    // auto t1 = high_resolution_clock::now();
+    // Constraint::Zaxis(m, &result[0], n, &x[0], &grad[0], &g_data);
+    // auto t2 = high_resolution_clock::now();
+    // duration<double, std::milli> ms_double = t2 - t1;
+    // std::cout << ms_double.count() << "ms\n";
+
+    // for (uint i=0; i<timesteps; i++)
+    // {
+    //     std::cout << result[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // std::cout << "\ngrad" << std::endl;
+
+    // for (uint i=0; i<m*n; ++i)
+    // {
+    //     std::cout << grad[i] << " ";
+    //     if (i%n==0 && i>0) 
+    //     {
+    //         std::cout << "\n\n";
+    //     }
+    // }
+    // std::cout << std::endl;
 
     ros::waitForShutdown();
     return 0;

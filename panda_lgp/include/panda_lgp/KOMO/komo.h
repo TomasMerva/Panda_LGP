@@ -41,7 +41,6 @@ class KOMO : public MotionROSTools
 
         friend std::ostream& operator<< (std::ostream& out, const KOMO& obj); 
 
-
         struct Phase
         {
             uint ID;

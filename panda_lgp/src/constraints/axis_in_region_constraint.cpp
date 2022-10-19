@@ -4,6 +4,34 @@
 
 void Constraint::AxisInRegion(unsigned m, double *result, unsigned n, const double* x, double* grad, void* f_data)
 {
+    // Constraint::ConstraintData *g_data = reinterpret_cast<Constraint::ConstraintData*>(f_data);
+
+    // std::vector<double> y_vec;
+    // for (uint t=0; t < (n/g_data->num_phase_variables); ++t)
+    // {
+    //     Eigen::Map<const Eigen::VectorXd> temp_q(x+t*g_data->num_phase_variables, g_data->num_phase_variables);
+
+    //     auto kin_conf = kinematics::GeometricJacobian(temp_q, true);
+    //     Eigen::MatrixXd J = kin_conf[0];
+    //     Eigen::MatrixXd FK = kin_conf[1];
+    //     y_vec.push_back(FK(1,3));
+    // }
+    // result[0] = (y_vec - g_data->region[1]) ;
+
+    // result[0] = - FK(1,3) + g_data->region[0];
+    // result[1] = FK(1,3) - g_data->region[1];
+
+    // if (grad)
+    // {
+    //     std::fill(grad, grad+m*n, 0);
+    //     for (uint i=0; i<7; ++i)
+    //     {
+    //         grad[i+ g_data->idx*g_data->num_phase_variables] = -J(1, i);
+    //         grad[i + g_data->idx*g_data->num_phase_variables +n] = J(1, i);
+    //     }
+    // }
+
+
     Constraint::ConstraintData *g_data = reinterpret_cast<Constraint::ConstraintData*>(f_data);
 
     uint slice_idx = g_data->idx*g_data->num_phase_variables;

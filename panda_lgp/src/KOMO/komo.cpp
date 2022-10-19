@@ -294,6 +294,18 @@ KOMO::ThirdLevel()
         opt.set_min_objective(KOMO_k2::GetCost, &objective);
 
         // ---- 4. Set constraints ----
+        // if (idx == 0)
+        // {
+        //     const std::vector<double> k_tolerance(20, 1e-6);
+        //     Constraint::ConstraintData g_data;
+        //     g_data.num_phase_variables = 7;
+        //     opt.add_inequality_mconstraint(Constraint::Zaxis, &g_data, k_tolerance);  
+        // }
+        const std::vector<double> k_tolerance(20, 1e-6);
+        Constraint::ConstraintData g_data;
+        g_data.num_phase_variables = 7;
+        opt.add_inequality_mconstraint(Constraint::Zaxis, &g_data, k_tolerance);
+
 
         // ---- 5. Set an initial guess ----
         std::vector<double> x = SetInitialGuess(phases[idx].x, phases[idx+1].x);
@@ -310,9 +322,7 @@ KOMO::ThirdLevel()
             duration<double, std::milli> ms_double = finish_time - start_time;
             std::cout << "Number of iterations: \t=\t" << objective.num_iterations << "\n";
             std::cout << "Total ms in NLOPT: \t=\t" << ms_double.count() << " ms\n";
-            VerboseSolver(result);
-            std::cout << "x size: " << x.size() << std::endl;
-            
+            VerboseSolver(result);            
             // ---- 7. Save results ----
             uint begin = 0;
             uint end = x_phase_dim;
@@ -443,3 +453,4 @@ std::ostream& operator<< (std::ostream& out, const KOMO& obj)
     out << "----------------------\n";
     return out;
 }
+

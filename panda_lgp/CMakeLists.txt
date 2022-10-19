@@ -44,6 +44,7 @@ add_library(lgp_lib SHARED
   # constraints
   src/constraints/manipulation_frame_constraint.cpp
   src/constraints/axis_in_region_constraint.cpp
+  src/constraints/z_axis_constraint.cpp
   # Logic
   src/action_skeleton/skeleton.cpp
   src/action_skeleton/operators.cpp

@@ -13,51 +13,11 @@ MotionROSTools::MotionROSTools(ros::NodeHandle &nh)
 }
 
 ///////////////////////////////////////////////////////////////////////
-/// @brief Publish markers to visualize trajectory in RViz
-/// @param TODO: I dont like vectors of vectors, change it so its more clear
-///////////////////////////////////////////////////////////////////////
-void MotionROSTools::VisualizeTrajectory(const std::vector<std::vector<double>> results, bool gripper)
-{
-    visualization_msgs::Marker line_strip;
-    line_strip.header.frame_id = "world";
-    line_strip.header.stamp = ros::Time::now();
-    line_strip.ns = "trajectory";
-    line_strip.action = visualization_msgs::Marker::ADD;
-    line_strip.pose.orientation.w = 1.0;
-    line_strip.id = 0;
-    line_strip.type = visualization_msgs::Marker::POINTS;
-    line_strip.scale.x = 0.01;
-    line_strip.scale.y = 0.01;
-    line_strip.color.g = 1.0;
-    line_strip.color.a = 1.0;
-
-    for (size_t t=0; t < results[0].size(); ++t)
-    {
-        Eigen::VectorXd timestep_joints(7);
-        timestep_joints <<  results[0][t],
-                            results[1][t],
-                            results[2][t],
-                            results[3][t],
-                            results[4][t],
-                            results[5][t],
-                            results[6][t];      
-        
-        Eigen::Matrix4d T = kinematics::ForwardKinematics(timestep_joints, true);
-        geometry_msgs::Point p;
-        p.x = T(0,3);
-        p.y = T(1,3);
-        p.z = T(2,3);
-        line_strip.points.push_back(p);
-    }
-    _marker_pub.publish(line_strip);
-    ROS_INFO("Visualizing trajectory...");
-}
-
-///////////////////////////////////////////////////////////////////////
 /// @brief Publish desired joints positions to the controller each "dt"
 /// @param TODO: dont like to format
 ///////////////////////////////////////////////////////////////////////
-void MotionROSTools::ExecuteTrajectory(const std::vector<std::vector<double>> results, const double traj_time)
+void 
+MotionROSTools::ExecuteTrajectory(const std::vector<std::vector<double>> results, const double traj_time)
 {
     double dt = traj_time / static_cast<double>(results[0].size());
     for (int i=0; i<results[0].size(); i++)
@@ -78,10 +38,49 @@ void MotionROSTools::ExecuteTrajectory(const std::vector<std::vector<double>> re
 }
 
 
-void MotionROSTools::JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
+void 
+MotionROSTools::JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
 {
     for (uint idx=0; idx<configuration.q_dim; idx++)
     {
         configuration.q_act[idx] = msg->position[idx];
     }
+}
+
+
+void MotionROSTools::VisualizeTrajectory(const std::vector<std::vector<double>> trajectory, const std_msgs::ColorRGBA &color, const int id)
+{
+    visualization_msgs::Marker line_strip;
+    line_strip.header.frame_id = "world";
+    line_strip.header.stamp = ros::Time::now();
+    line_strip.ns = "trajectory";
+    line_strip.action = visualization_msgs::Marker::ADD;
+    line_strip.pose.orientation.w = 1.0;
+    line_strip.id = id;
+    line_strip.type = visualization_msgs::Marker::POINTS;
+    line_strip.scale.x = 0.01;
+    line_strip.scale.y = 0.01;
+    // line_strip.color = color;
+
+    for (size_t t=0; t < trajectory.size(); t++)
+    {
+        Eigen::VectorXd q(7);
+        q << trajectory[t][0],
+             trajectory[t][1],
+             trajectory[t][2],
+             trajectory[t][3],
+             trajectory[t][4],
+             trajectory[t][5],
+             trajectory[t][6];
+
+        Eigen::Matrix4d T = kinematics::ForwardKinematics(q, true);
+        geometry_msgs::Point p;
+        p.x = T(0,3);
+        p.y = T(1,3);
+        p.z = T(2,3);
+        line_strip.points.push_back(p);
+        line_strip.colors.push_back(color);
+    }
+    _marker_pub.publish(line_strip);
+    ROS_INFO("Visualizing trajectory...");
 }
