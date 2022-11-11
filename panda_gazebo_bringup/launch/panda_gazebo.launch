@@ -19,6 +19,7 @@
   <arg name="roll"        default="0"     doc="How much to rotate the base of the robot around its X-axis in [rad]?" />
   <arg name="pitch"       default="0"     doc="How much to rotate the base of the robot around its Y-axis in [rad]?" />
   <arg name="yaw"         default="0"     doc="How much to rotate the base of the robot around its Z-axis in [rad]?" />
+  <arg name="xacro_args"  default=""      doc="Additional arguments to pass to panda.urdf.xacro" />
   <arg name="initial_joint_positions"
        doc="Initial joint configuration of the panda. Specify as a list of name/value pairs in form of '-J [name-of-joint] [value-in-rad]'. Default is a 90 degree bend in the elbow"
        default="-J $(arg arm_id)_joint1 0
@@ -62,12 +63,13 @@
   </include>
 
   <param name="robot_description"
-         command="xacro $(find franka_description)/robots/panda_arm.urdf.xacro
+         command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
                   gazebo:=true
                   hand:=$(arg use_gripper)
                   arm_id:=$(arg arm_id)
                   xyz:='$(arg x) $(arg y) $(arg z)'
-                  rpy:='$(arg roll) $(arg pitch) $(arg yaw)'">
+                  rpy:='$(arg roll) $(arg pitch) $(arg yaw)'                  
+                  $(arg xacro_args)">
   </param>
 
   <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
@@ -95,11 +97,11 @@
   />
 
   <!-- spawns the controller after the robot was put into its initial joint pose -->
-  <node pkg="franka_gazebo"
-        type="delayed_controller_spawner.py"
+  <node pkg="controller_manager"
+        type="spawner"
         name="$(arg arm_id)_controller_spawner"
         respawn="false" output="screen"
-        args="franka_state_controller $(arg controller)"
+        args="--wait-for initialized franka_state_controller $(arg controller)"
   />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
