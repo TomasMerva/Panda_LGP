@@ -15,16 +15,10 @@ void VisualizeRviz::VisualizeTrajectory(Eigen::ArrayXXd x)
     line_strip.pose.orientation.w = 1.0;
     line_strip.id = 0;
     line_strip.type = visualization_msgs::Marker::POINTS;
-    line_strip.scale.x = 0.1;
-    line_strip.scale.y = 0.1;
-    line_strip.scale.z = 0.1;
-
-
-    std_msgs::ColorRGBA marker_color;
-    marker_color.g = 1;
-    marker_color.a = 1;
-    // line_strip.color.g = 1;
-    // line_strip.color.a = 1;
+    line_strip.scale.x = 0.01;
+    line_strip.scale.y = 0.01;
+    line_strip.color.g = 1.0;
+    line_strip.color.a = 1.0;
 
     for (size_t t=0; t < x.cols(); t++)
     {
@@ -33,7 +27,6 @@ void VisualizeRviz::VisualizeTrajectory(Eigen::ArrayXXd x)
         p.y = x.col(t)[1];
         p.z = x.col(t)[2];
         line_strip.points.push_back(p);
-        line_strip.colors.push_back(marker_color);
     }
     _marker_pub.publish(line_strip);
     ROS_INFO("Visualizing trajectory...");

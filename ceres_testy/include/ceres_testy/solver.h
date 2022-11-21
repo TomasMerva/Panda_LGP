@@ -7,12 +7,13 @@
 #include <ceres_testy/collision_constraint.h>
 #include <ceres_testy/mu_loss_function.h>
 
+#include <chrono>
+
 class Solver
 {
     public:
         Solver(const int num_timestep_var, const int num_timesteps);
         void Solve();
-        void UnconstrainedOptimization();
         void CreateInitGuess(bool linspace_flag);
         void SetBoundaries();
 
@@ -28,7 +29,6 @@ class Solver
 
         // Inequality constraints parameters
         std::vector<double> _lambda;
-        double _mu;
 };
 
 

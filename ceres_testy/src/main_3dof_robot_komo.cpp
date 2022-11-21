@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
     VisualizeRviz vis(nh);
 
-    Solver solver(3, 10);
+    Solver solver(3, 20);
     solver.q_start = std::vector<double>{0.05, 0.0, 0.5};
     solver.q_goal = std::vector<double>{2.0, 0.0, 0.5};
     solver.Solve();
