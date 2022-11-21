@@ -6,14 +6,14 @@
 #include <gnuplot_module/gnuplot_module.h>
 
 
-std::vector<double> q_start(7);
+// std::vector<double> q_start(7);
 
 void JointStateCallback(const sensor_msgs::JointStateConstPtr& msg)
 {
-    for (int idx=0; idx<7; idx++)
-    {
-        q_start[idx] = msg->position[idx];
-    }
+    // for (int idx=0; idx<7; idx++)
+    // {
+    //     q_start[idx] = msg->position[idx];
+    // }
 }
 
 int main(int argc, char **argv)
@@ -30,12 +30,12 @@ int main(int argc, char **argv)
     // ROS init
     ros::AsyncSpinner spinner(1);
     spinner.start();
-    ros::Subscriber joint_state_sub = nh.subscribe("/joint_states", 1, JointStateCallback);
+    // ros::Subscriber joint_state_sub = nh.subscribe("/joint_states", 1, JointStateCallback);
 
     const int num_joints = 7;
     const int num_time_slices = 20;
-    std::vector<double> q_goal{0.096, 0.308, 0.646, -2.249, 0.06, 2.53, 2.019}; 
-
+     std::vector<double> q_start{-1.2116, 0.356153, 0.244033, -2.28525, -1.68591, 2.35773, 4.035e-08};
+    std::vector<double> q_goal{-1.06086, 0.436372, 0.461309, -2.32378, -1.67167, 2.46085, 4.035e-08};
     // safety break
     ros::Duration(0.5).sleep();
 

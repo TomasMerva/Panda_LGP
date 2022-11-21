@@ -20,15 +20,15 @@ int main(int argc, char **argv)
     // num_phases, time slices, seconds for traj, k-order
     // komo.SetTiming(4, 20, 5, 2);
 
-    // logic::Skeleton S({
-    //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
-    //     logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
-    //     logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
-    //     logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
-    // });
     logic::Skeleton S({
-        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"})    
+        logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"}),
+        logic::SkeletonEntry(logic::SkeletonAction::Pick, {"panda_link8", "cube_A", "grey_region"} ),
+        logic::SkeletonEntry(logic::SkeletonAction::MoveH, {"panda_link8", "cube_A", "grey_region", "red_region"} ),
+        logic::SkeletonEntry(logic::SkeletonAction::Place, {"panda_link8", "cube_A", "red_region"} )
     });
+    // logic::Skeleton S({
+    //     logic::SkeletonEntry(logic::SkeletonAction::MoveF, {"panda_link8", "red_region", "grey_region"})    
+    // });
 
     S.SetKOMO(&komo);
     // std::cout << komo << std::endl;
@@ -55,9 +55,9 @@ int main(int argc, char **argv)
 
     // just to test 3.level
     komo.phases[1].x = std::vector<double>{-1.2116, 0.356153, 0.244033, -2.28525, -1.68591, 2.35773, 4.035e-08};
-    // komo.phases[2].x = std::vector<double>{-1.06086, 0.436372, 0.461309, -2.32378, -1.67167, 2.46085, 4.035e-08};
-    // komo.phases[3].x = std::vector<double>{-0.747309, 0.356153, 0.908409, -2.42052, -1.6404, 2.67201, 4.035e-08};
-    // komo.phases[4].x = std::vector<double>{-0.507423, 1.26222, 1.34696, -2.40899, -1.60368, 2.87996, 4.035e-08};    
+    komo.phases[2].x = std::vector<double>{-1.06086, 0.436372, 0.461309, -2.32378, -1.67167, 2.46085, 4.035e-08};
+    komo.phases[3].x = std::vector<double>{-0.747309, 0.356153, 0.908409, -2.42052, -1.6404, 2.67201, 4.035e-08};
+    komo.phases[4].x = std::vector<double>{-0.747309, 0.5, 0.908409, -2.42052, -1.6404, 2.67201, 4.035e-08};    
     KomoStatus komo_status = komo.Optimize(LgpLevel::THIRD_LEVEL);
     if (komo_status == KomoStatus::KS_SolutionFound)
     {

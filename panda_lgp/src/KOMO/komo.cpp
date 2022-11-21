@@ -301,10 +301,10 @@ KOMO::ThirdLevel()
         //     g_data.num_phase_variables = 7;
         //     opt.add_inequality_mconstraint(Constraint::Zaxis, &g_data, k_tolerance);  
         // }
-        const std::vector<double> k_tolerance(20, 1e-6);
-        Constraint::ConstraintData g_data;
-        g_data.num_phase_variables = 7;
-        opt.add_inequality_mconstraint(Constraint::Zaxis, &g_data, k_tolerance);
+        // const std::vector<double> k_tolerance(20, 1e-6);
+        // Constraint::ConstraintData g_data;
+        // g_data.num_phase_variables = 7;
+        // opt.add_inequality_mconstraint(Constraint::Zaxis, &g_data, k_tolerance);
 
 
         // ---- 5. Set an initial guess ----
@@ -412,7 +412,22 @@ KOMO::SetInitialGuess(const std::vector<double> &start_state, const std::vector<
         init.push_back(q5[i]);
         init.push_back(q6[i]);
     }
+    // for (uint i=0; i<18; ++i)
+    // {
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    //     init.push_back(start_state[i]);
+    // }
+    // for (uint i=0; i<7;++i)
+    // {
+    //     init.push_back(goal_state[i]);
+    // }
     return init;
+
 }
 
 

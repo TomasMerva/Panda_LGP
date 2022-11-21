@@ -58,32 +58,32 @@ std::vector<std::vector<double>> KOMO::Optimize()
     std::vector<AddPointToPointDistanceData> APTPD_constraint_data(_num_time_slices);
     std::vector<AddFixedOrientationAxisData> AFOA_constraint_data(_num_time_slices);
 
-    for (auto g : _constraint_list)
-    {
-        std::cout << "g is: " << g << "\n";
-        if (g == FS_none)
-        {
-            opt.remove_equality_constraints();
-            opt.remove_inequality_constraints();
-        }
-        else if (g == FS_PointToPointDistance)
-        {
-            for (size_t idx = 0; idx<_num_time_slices; idx++)
-            {
-                APTPD_constraint_data[idx] = {idx, 0.5, 0.0, 0.1, 0.3};
-                opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &APTPD_constraint_data[idx], kTolerance);
-            }
-        }
-        else if( g == FS_FixedOrientationAxis)
-        {
-            auto FK_q = Kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(_start_state.data(), _num_joints), true);
-            for (size_t idx=0; idx<_num_time_slices; idx++)
-            {
-                AFOA_constraint_data[idx] = {idx, 0, FK_q(0,0), FK_q(1,0), FK_q(2,0)};
-                opt.add_equality_constraint(Constraint::AddFixedOrientationAxis, &AFOA_constraint_data[idx], kTolerance);
-            }
-        }
-    }
+    // for (auto g : _constraint_list)
+    // {
+    //     std::cout << "g is: " << g << "\n";
+    //     if (g == FS_none)
+    //     {
+    //         opt.remove_equality_constraints();
+    //         opt.remove_inequality_constraints();
+    //     }
+    //     else if (g == FS_PointToPointDistance)
+    //     {
+    //         for (size_t idx = 0; idx<_num_time_slices; idx++)
+    //         {
+    //             APTPD_constraint_data[idx] = {idx, 0.5, 0.0, 0.1, 0.3};
+    //             opt.add_inequality_constraint(Constraint::AddPointToPointDistanceConstraint, &APTPD_constraint_data[idx], kTolerance);
+    //         }
+    //     }
+    //     else if( g == FS_FixedOrientationAxis)
+    //     {
+    //         auto FK_q = Kinematics::ForwardKinematics(Eigen::Map<const Eigen::VectorXd>(_start_state.data(), _num_joints), true);
+    //         for (size_t idx=0; idx<_num_time_slices; idx++)
+    //         {
+    //             AFOA_constraint_data[idx] = {idx, 0, FK_q(0,0), FK_q(1,0), FK_q(2,0)};
+    //             opt.add_equality_constraint(Constraint::AddFixedOrientationAxis, &AFOA_constraint_data[idx], kTolerance);
+    //         }
+    //     }
+    // }
 
 
     // 5. set an initial guess
